@@ -8,6 +8,7 @@ import local.dev.mavenproject3processmodel.examples.OnboardingExample;
 import local.dev.mavenproject3processmodel.model.ProcessModel;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
 import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
+import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 
 /** NetBeans Run / executable JAR entry point. No arguments runs the onboarding demo. */
 public final class Mavenproject3processmodel {
@@ -19,9 +20,9 @@ public final class Mavenproject3processmodel {
     public static int run(String[] args, PrintStream out, PrintStream err) {
         String[] command = args.length == 0 ? new String[]{"demo", "target/onboarding.process.xml"} : args;
         boolean validArgs = command.length == 2 && (command[0].equals("demo") || command[0].equals("validate"))
-            || command.length == 3 && command[0].equals("copy");
+            || command.length == 3 && (command[0].equals("copy") || command[0].equals("html"));
         if (!validArgs) {
-            err.println("Usage: [demo OUTPUT.process.xml | validate INPUT.process.xml | copy INPUT.process.xml OUTPUT.process.xml]");
+            err.println("Usage: [demo OUTPUT.process.xml | validate INPUT.process.xml | copy INPUT.process.xml OUTPUT.process.xml | html INPUT.process.xml OUTPUT.html]");
             return 2;
         }
         try {
@@ -29,14 +30,23 @@ public final class Mavenproject3processmodel {
             ProcessModel saved;
             if (command[0].equals("demo")) {
                 Path output = Path.of(command[1]);
+                Path html = ProcessModelHtml.companionPath(output);
+                ProcessModelHtml.requireDifferent(output, html);
                 var model = OnboardingExample.model();
                 codec.write(model, output);
                 saved = codec.read(output);
                 if (!saved.equals(model)) throw new IllegalStateException("Saved model round trip differs");
                 out.println("Saved and reloaded " + output);
+                new ProcessModelHtml().write(output, html);
+                out.println("Saved HTML " + html);
             } else if (command[0].equals("validate")) {
                 saved = codec.read(Path.of(command[1]));
                 out.println("Validated " + command[1]);
+            } else if (command[0].equals("html")) {
+                Path output = Path.of(command[2]);
+                new ProcessModelHtml().write(Path.of(command[1]), output);
+                out.println("Saved HTML " + output);
+                return 0;
             } else {
                 Path input = Path.of(command[1]).toAbsolutePath().normalize();
                 Path output = Path.of(command[2]).toAbsolutePath().normalize();
@@ -50,7 +60,8 @@ public final class Mavenproject3processmodel {
             summary(saved, out);
             return 0;
         } catch (IOException | IllegalArgumentException ex) {
-            err.println("Process model failed: " + ex.getMessage().replace('\n', ' ').replace('\r', ' '));
+            String message = ex.getMessage();
+            err.println("Process model failed: " + (message == null ? ex.getClass().getSimpleName() : message.replace('\n', ' ').replace('\r', ' ')));
             return 1;
         }
     }

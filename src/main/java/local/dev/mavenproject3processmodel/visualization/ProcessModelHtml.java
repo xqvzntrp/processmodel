@@ -14,6 +14,7 @@ import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
 /** Basic read-only HTML projection. Always parses a saved process-model XML file. */
 public final class ProcessModelHtml {
     public static Path companionPath(Path xml) {
+        if (xml.getFileName() == null) throw new IllegalArgumentException("XML output must name a file");
         String name = xml.getFileName().toString();
         if (name.endsWith(".process.xml")) name = name.substring(0, name.length() - 12);
         else if (name.endsWith(".xml")) name = name.substring(0, name.length() - 4);

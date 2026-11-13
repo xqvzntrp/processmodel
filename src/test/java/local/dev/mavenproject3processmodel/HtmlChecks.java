@@ -42,6 +42,7 @@ final class HtmlChecks {
         check(ProcessModelHtml.companionPath(Path.of("demo.process.xml")).equals(Path.of("demo.html")), "process XML companion path");
         check(ProcessModelHtml.companionPath(Path.of("demo.xml")).equals(Path.of("demo.html")), "XML companion path");
         check(ProcessModelHtml.companionPath(Path.of("demo.txt")).equals(Path.of("demo.txt.html")), "other extension companion path");
+        rejects(() -> ProcessModelHtml.companionPath(Path.of("/")), "must name a file");
         Path dir = Files.createTempDirectory("process-html-");
         try {
             var fixture = new ModelChecks.Fixture();
