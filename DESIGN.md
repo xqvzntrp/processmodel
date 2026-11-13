@@ -57,3 +57,20 @@ demonstrate the richer information.
 
 Each commit must pass its relevant checks before committing. No external application
 or test libraries, graphical editor, execution engine or automatic BPMN adaptation.
+
+## Implementation record
+
+The input ZIP contained 16 Java records/enums, with no build, parser or tests.
+Original archive SHA-256:
+`a5393ce019e65cdba86e0e26a9eecb0ded049ec0db43962a0a8fa286452d7ca6`.
+The source archive remains unchanged. The record fields are retained; the package
+was renamed for this project and PARALLEL_GATEWAY was added. The aggregate's list
+copies and ProcessDefinition's nonblank-ID check were retained. Other structural
+rules live in the separate validator rather than being scattered through records.
+
+Verified progression before the planned commits: 1 build check, 45 checks with the
+rich model/validator, 84 with secure XML, and 110 with the onboarding example and
+launcher. The final documentation commit reruns all 110 checks and the application.
+NetBeans Run uses a project action mapping; no-argument Run File uses the same demo.
+The executable JAR has also been exercised. No source history was rewritten or
+pushed, and the separate BPMN reader project was not modified.
