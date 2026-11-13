@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>local.dev</groupId>
     <artifactId>mavenproject3processmodel</artifactId>
@@ -9,5 +10,46 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <exec.mainClass>local.dev.mavenproject3processmodel.Mavenproject3processmodel</exec.mainClass>
+        <skipTests>false</skipTests>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <compilerArgs><arg>-Xlint:all</arg><arg>-Werror</arg></compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration><mainClass>${exec.mainClass}</mainClass></configuration>
+                <executions>
+                    <execution>
+                        <id>process-model-checks</id>
+                        <phase>test</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <skip>${skipTests}</skip>
+                            <executable>${java.home}/bin/java</executable>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <!-- Keep harness arguments out of NetBeans' application-argument discovery. -->
+                            <commandlineArgs>-cp &quot;${project.build.testOutputDirectory}${path.separator}${project.build.outputDirectory}&quot; local.dev.mavenproject3processmodel.Tests</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <archive><manifest><mainClass>local.dev.mavenproject3processmodel.Mavenproject3processmodel</mainClass></manifest></archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
