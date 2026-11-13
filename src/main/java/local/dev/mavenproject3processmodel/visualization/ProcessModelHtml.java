@@ -5,7 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.List;
 import local.dev.mavenproject3processmodel.model.*;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
@@ -44,7 +47,8 @@ public final class ProcessModelHtml {
         html.append("<p>Read-only view of the saved process model. Conditions are descriptive text; no activities are executed.</p>\n");
         html.append("<h2>Flowchart</h2>\n");
         html.append("<p>User and service tasks are marked in their labels. Arrows show control flow. The diagram loads Mermaid from a CDN and requires internet access; its source remains visible if the library cannot load.</p>\n");
-        html.append("<pre class=\"mermaid\">\n").append(escape(mermaid(model))).append("</pre>\n");
+        html.append("<pre class=\"mermaid\">\n").append(escape(mermaid(model, null))).append("</pre>\n");
+        subprocessDiagrams(html, model);
         table(html, "Validation warnings", List.of("Severity", "Code", "Entity", "Message"), diagnostics);
         table(html, "Process", List.of("ID", "Name", "Description"), model.processes());
         table(html, "Elements", List.of("ID", "Process", "Type", "Name", "Description", "Parent subprocess"), model.elements());
@@ -75,16 +79,41 @@ public final class ProcessModelHtml {
                 || Files.exists(input) && Files.exists(output) && Files.isSameFile(input, output))
             throw new IllegalArgumentException("XML input and HTML output must identify different files");
     }
-    private static String mermaid(ProcessModel model) {
+    private static void subprocessDiagrams(StringBuilder html, ProcessModel model) {
+        var byParent = new LinkedHashMap<String, List<ProcessElement>>();
+        var byId = new LinkedHashMap<String, ProcessElement>();
+        for (var element : model.elements()) {
+            byId.put(element.elementId(), element);
+            if (element.elementType() == ElementType.SUB_PROCESS)
+                byParent.computeIfAbsent(element.parentSubprocessId(), key -> new ArrayList<>()).add(element);
+        }
+        var pending = new ArrayDeque<ProcessElement>();
+        var roots = byParent.getOrDefault(null, List.of());
+        for (int i = roots.size() - 1; i >= 0; i--) pending.push(roots.get(i));
+        // Parent-before-child traversal without Java recursion, independent of record order.
+        while (!pending.isEmpty()) {
+            var scope = pending.pop();
+            var parent = byId.get(scope.parentSubprocessId());
+            String context = parent == null ? "Main process" : name(parent.name(), parent.elementId()) + " (" + parent.elementId() + ")";
+            html.append("<h2>Subprocess: ").append(escape(name(scope.name(), scope.elementId()))).append("</h2>\n");
+            html.append("<p>ID: ").append(escape(scope.elementId())).append("; Parent: ").append(escape(context)).append("</p>\n");
+            html.append("<pre class=\"mermaid\">\n").append(escape(mermaid(model, scope.elementId()))).append("</pre>\n");
+            var children = byParent.getOrDefault(scope.elementId(), List.of());
+            for (int i = children.size() - 1; i >= 0; i--) pending.push(children.get(i));
+        }
+    }
+    private static String mermaid(ProcessModel model, String parentId) {
         var ids = new LinkedHashMap<String, String>();
         var text = new StringBuilder("flowchart TD\n");
         for (var node : model.elements()) {
+            if (!Objects.equals(node.parentSubprocessId(), parentId)) continue;
             String id = "n" + ids.size(); ids.put(node.elementId(), id);
             String label = name(node.name(), node.elementId());
             String open;
             String close;
             switch (node.elementType()) {
                 case START_EVENT, END_EVENT -> { open = "((\""; close = "\"))"; }
+                case SUB_PROCESS -> { open = "[[\""; close = "\"]]"; label = "Subprocess: " + label; }
                 case TASK, USER_TASK, SERVICE_TASK -> {
                     open = "[\""; close = "\"]";
                     if (node.elementType() == ElementType.USER_TASK) label = "User: " + label;
@@ -99,6 +128,7 @@ public final class ProcessModelHtml {
             text.append("  ").append(id).append(open).append(label(label)).append(close).append('\n');
         }
         for (var flow : model.relationships()) {
+            if (!ids.containsKey(flow.sourceElementId())) continue;
             text.append("  ").append(ids.get(flow.sourceElementId())).append(" -->");
             String caption = flow.name();
             if (flow.isDefault()) caption = caption == null || caption.isEmpty() ? "default" : caption + " (default)";
