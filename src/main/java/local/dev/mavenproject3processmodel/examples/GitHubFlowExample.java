@@ -1,6 +1,11 @@
 package local.dev.mavenproject3processmodel.examples;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
+import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
+import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 import local.dev.mavenproject3processmodel.model.*;
 
 /**
@@ -10,6 +15,37 @@ import local.dev.mavenproject3processmodel.model.*;
  */
 public final class GitHubFlowExample {
     private GitHubFlowExample() { }
+
+    public static void main(String[] args) {
+        if (args.length > 1) {
+            System.err.println("Usage: GitHubFlowExample [OUTPUT.process.xml]");
+            System.exit(2);
+            return;
+        }
+        try {
+            Path output = Path.of(args.length == 0 ? "target/github-flow.process.xml" : args[0]);
+            Path html = ProcessModelHtml.companionPath(output);
+            ProcessModelHtml.requireDifferent(output, html);
+            var codec = new ProcessModelXml();
+            var model = model();
+            codec.write(model, output);
+            var saved = codec.read(output);
+            if (!saved.equals(model)) throw new IllegalStateException("Saved GitHub Flow model differs");
+            new ProcessModelHtml().write(output, html);
+            System.out.println("Saved and reloaded " + output);
+            System.out.println("Saved HTML " + html);
+            System.out.println("Elements: " + saved.elements().size() + "; relationships: " + saved.relationships().size());
+            var validation = new ProcessModelValidator().validate(saved);
+            System.out.println("Structurally valid; warnings: " + validation.diagnostics().size());
+            for (var diagnostic : validation.diagnostics()) System.out.println(diagnostic.severity() + " "
+                + diagnostic.code() + " [" + diagnostic.entityId() + "]: " + diagnostic.message());
+        } catch (IOException | IllegalArgumentException ex) {
+            String message = ex.getMessage();
+            System.err.println("GitHub Flow example failed: " + (message == null ? ex.getClass().getSimpleName()
+                : message.replace('\n', ' ').replace('\r', ' ')));
+            System.exit(1);
+        }
+    }
 
     public static ProcessModel model() {
         return new ProcessModel(

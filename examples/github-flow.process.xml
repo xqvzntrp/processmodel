@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8"?><processModel xmlns="urn:local.dev:processmodel:1" version="1">
+  <processes>
+    <processDefinition>
+      <processId>githubFlow</processId>
+      <name>Software change: proposal to merge</name>
+      <description>Adapted from GitHub Flow. Review and checks are coordinated for the latest commits; merge, revise or close after assessment.</description>
+    </processDefinition>
+  </processes>
+  <elements>
+    <processElement>
+      <elementId>proposed</elementId>
+      <processId>githubFlow</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Change proposed</name>
+      <description>A proposed software change is available.</description>
+    </processElement>
+    <processElement>
+      <elementId>describe</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Describe the change</name>
+      <description>Record its purpose, scope and acceptance criteria.</description>
+    </processElement>
+    <processElement>
+      <elementId>branch</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Create a branch</name>
+      <description>Choose a branch for this change.</description>
+    </processElement>
+    <processElement>
+      <elementId>implement</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Implement the change</name>
+      <description>Prepare the change and its tests.</description>
+    </processElement>
+    <processElement>
+      <elementId>publish</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Commit &amp; push changes</name>
+      <description>Describe publication of the proposed commits; no push is performed by this model.</description>
+    </processElement>
+    <processElement>
+      <elementId>openPr</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Open a pull request</name>
+      <description>Explain the change and request feedback.</description>
+    </processElement>
+    <processElement>
+      <elementId>fork</elementId>
+      <processId>githubFlow</processId>
+      <elementType>PARALLEL_GATEWAY</elementType>
+      <name>Begin checks and review</name>
+      <description>Our adaptation allows both branches to proceed in parallel.</description>
+    </processElement>
+    <processElement>
+      <elementId>checks</elementId>
+      <processId>githubFlow</processId>
+      <elementType>SERVICE_TASK</elementType>
+      <name>Run automated checks</name>
+      <description>Record a completed result, including failure; checks must finish for this revision.</description>
+    </processElement>
+    <processElement>
+      <elementId>review</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Review the change</name>
+      <description>Record approval, requested changes or other feedback for this revision.</description>
+    </processElement>
+    <processElement>
+      <elementId>join</elementId>
+      <processId>githubFlow</processId>
+      <elementType>PARALLEL_GATEWAY</elementType>
+      <name>Collect both results</name>
+      <description>Our adaptation waits for both review and checks, even if one reports a problem.</description>
+    </processElement>
+    <processElement>
+      <elementId>assess</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Assess merge readiness</name>
+      <description>Consider both results, conflicts, repository rules and whether to continue.</description>
+    </processElement>
+    <processElement>
+      <elementId>decision</elementId>
+      <processId>githubFlow</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Next action</name>
+      <description>Select exactly one descriptive outcome: ready, revise or close.</description>
+    </processElement>
+    <processElement>
+      <elementId>revise</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Revise, commit &amp; push</name>
+      <description>Address feedback, failed checks or conflicts; repeat review and checks for the updated commits.</description>
+    </processElement>
+    <processElement>
+      <elementId>merge</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Merge the pull request</name>
+      <description>Describe the authorized merge; no repository changes are made by this model.</description>
+    </processElement>
+    <processElement>
+      <elementId>cleanup</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Delete the completed branch</name>
+      <description>Describe post-merge cleanup; this application deletes no branches.</description>
+    </processElement>
+    <processElement>
+      <elementId>merged</elementId>
+      <processId>githubFlow</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Change merged</name>
+      <description>The change is integrated and branch cleanup is complete.</description>
+    </processElement>
+    <processElement>
+      <elementId>closePr</elementId>
+      <processId>githubFlow</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Close without merging</name>
+      <description>Our adaptation records the decision to stop pursuing the change.</description>
+    </processElement>
+    <processElement>
+      <elementId>closed</elementId>
+      <processId>githubFlow</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Change closed without merge</name>
+      <description>The proposed change is not integrated.</description>
+    </processElement>
+  </elements>
+  <relationships>
+    <processRelationship>
+      <relationshipId>gf01</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>proposed</sourceElementId>
+      <targetElementId>describe</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf02</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>describe</sourceElementId>
+      <targetElementId>branch</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf03</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>branch</sourceElementId>
+      <targetElementId>implement</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf04</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>implement</sourceElementId>
+      <targetElementId>publish</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf05</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>publish</sourceElementId>
+      <targetElementId>openPr</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf06</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>openPr</sourceElementId>
+      <targetElementId>fork</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf07</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>fork</sourceElementId>
+      <targetElementId>checks</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf08</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>fork</sourceElementId>
+      <targetElementId>review</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf09</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>checks</sourceElementId>
+      <targetElementId>join</targetElementId>
+      <name>Checks completed</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf10</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>review</sourceElementId>
+      <targetElementId>join</targetElementId>
+      <name>Review completed</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf11</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>join</sourceElementId>
+      <targetElementId>assess</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf12</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>assess</sourceElementId>
+      <targetElementId>decision</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf13</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>revise</targetElementId>
+      <name>Revise</name>
+      <conditionExpression>mergeDecision == 'revise'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf14</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>revise</sourceElementId>
+      <targetElementId>fork</targetElementId>
+      <name>Updated commits</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf15</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>merge</targetElementId>
+      <name>Ready to merge</name>
+      <conditionExpression>mergeDecision == 'ready'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf16</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>merge</sourceElementId>
+      <targetElementId>cleanup</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf17</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>cleanup</sourceElementId>
+      <targetElementId>merged</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf18</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>closePr</targetElementId>
+      <name>Close without merging</name>
+      <conditionExpression>mergeDecision == 'close'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>gf19</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>closePr</sourceElementId>
+      <targetElementId>closed</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+  </relationships>
+  <inputs>
+    <processInput>
+      <processId>githubFlow</processId>
+      <inputName>repositoryName</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>githubFlow</processId>
+      <inputName>targetBranch</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>githubFlow</processId>
+      <inputName>changeDescription</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>githubFlow</processId>
+      <inputName>relatedIssue</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>false</isRequired>
+    </processInput>
+  </inputs>
+  <performers>
+    <performerDefinition>
+      <performerId>authorRole</performerId>
+      <name>Change author</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Authors the change and responds to feedback.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>reviewerRole</performerId>
+      <name>Reviewer</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Reviews the proposed revision.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>maintainerRole</performerId>
+      <name>Maintainer</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Assesses readiness and decides whether to merge or close.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>ciSystem</performerId>
+      <name>Build system</name>
+      <performerType>SYSTEM</performerType>
+      <description>Produces check results for the proposed revision.</description>
+    </performerDefinition>
+  </performers>
+  <assignments>
+    <activityAssignment>
+      <elementId>describe</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>branch</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>implement</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>publish</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>openPr</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>checks</elementId>
+      <performerId>ciSystem</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>review</elementId>
+      <performerId>reviewerRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>assess</elementId>
+      <performerId>maintainerRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>revise</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>merge</elementId>
+      <performerId>maintainerRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>cleanup</elementId>
+      <performerId>authorRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>closePr</elementId>
+      <performerId>maintainerRole</performerId>
+    </activityAssignment>
+  </assignments>
+  <dataItems>
+    <processDataItem>
+      <dataItemId>changeSpec</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Change specification</name>
+      <description>Purpose and acceptance criteria.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>branchRecord</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Branch record</name>
+      <description>Working branch and its target.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>commitSet</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Proposed commits</name>
+      <description>The latest revision under review; revision identity is descriptive, not enforced.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>pullRequest</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Pull request</name>
+      <description>Proposal, discussion and current status.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>checkResults</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Check results</name>
+      <description>Completed pass/fail results for the latest revision.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>reviewFeedback</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Review feedback</name>
+      <description>Reviewer response for the latest revision.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>mergeAssessment</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Merge assessment</name>
+      <description>Ready, revise or close, with a reason.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>repositoryOutcome</dataItemId>
+      <processId>githubFlow</processId>
+      <name>Repository outcome</name>
+      <description>Merged and cleaned up, or closed without merging.</description>
+    </processDataItem>
+  </dataItems>
+  <dataAssociations>
+    <activityDataAssociation>
+      <elementId>describe</elementId>
+      <dataItemId>changeSpec</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>branch</elementId>
+      <dataItemId>changeSpec</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>branch</elementId>
+      <dataItemId>branchRecord</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>implement</elementId>
+      <dataItemId>changeSpec</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>implement</elementId>
+      <dataItemId>branchRecord</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>implement</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>publish</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>openPr</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>openPr</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>checks</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>checks</elementId>
+      <dataItemId>checkResults</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>reviewFeedback</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>assess</elementId>
+      <dataItemId>checkResults</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>assess</elementId>
+      <dataItemId>reviewFeedback</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>assess</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>assess</elementId>
+      <dataItemId>mergeAssessment</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>mergeAssessment</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>checkResults</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>reviewFeedback</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>merge</elementId>
+      <dataItemId>mergeAssessment</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>merge</elementId>
+      <dataItemId>commitSet</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>merge</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>cleanup</elementId>
+      <dataItemId>branchRecord</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>cleanup</elementId>
+      <dataItemId>repositoryOutcome</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>closePr</elementId>
+      <dataItemId>mergeAssessment</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>closePr</elementId>
+      <dataItemId>pullRequest</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>closePr</elementId>
+      <dataItemId>repositoryOutcome</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+  </dataAssociations>
+  <openQuestions>
+    <processOpenQuestion>
+      <questionId>qSoloReview</questionId>
+      <processId>githubFlow</processId>
+      <elementId>review</elementId>
+      <description>Who may review a change in a solo-maintained project?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>qRequiredChecks</questionId>
+      <processId>githubFlow</processId>
+      <elementId>checks</elementId>
+      <description>Which checks must pass for this repository?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>qMergeRules</questionId>
+      <processId>githubFlow</processId>
+      <elementId>assess</elementId>
+      <description>Which approvals, conflict checks and branch-protection rules define readiness to merge?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>qClosedBranch</questionId>
+      <processId>githubFlow</processId>
+      <elementId>closePr</elementId>
+      <description>Should the branch be retained or deleted after closure without merging?</description>
+    </processOpenQuestion>
+  </openQuestions>
+</processModel>

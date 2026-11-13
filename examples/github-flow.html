@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Software change: proposal to merge</title>
+  <style>
+    table { border-collapse: collapse; }
+    th, td { border: 1px solid #aaa; padding: 4px; text-align: left; vertical-align: top; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<h1>Software change: proposal to merge</h1>
+<p>Read-only view of the saved process model. Conditions are descriptive text; no activities are executed.</p>
+<h2>Flowchart</h2>
+<p>User and service tasks are marked in their labels. Arrows show control flow. The diagram loads Mermaid from a CDN and requires internet access; its source remains visible if the library cannot load.</p>
+<pre class="mermaid">
+flowchart TD
+  n0((&quot;Change proposed&quot;))
+  n1[&quot;User#58; Describe the change&quot;]
+  n2[&quot;User#58; Create a branch&quot;]
+  n3[&quot;User#58; Implement the change&quot;]
+  n4[&quot;User#58; Commit #38; push changes&quot;]
+  n5[&quot;User#58; Open a pull request&quot;]
+  n6{&quot;#43;#58; Begin checks and review&quot;}
+  n7[&quot;Service#58; Run automated checks&quot;]
+  n8[&quot;User#58; Review the change&quot;]
+  n9{&quot;#43;#58; Collect both results&quot;}
+  n10[&quot;User#58; Assess merge readiness&quot;]
+  n11{&quot;X#58; Next action&quot;}
+  n12[&quot;User#58; Revise#44; commit #38; push&quot;]
+  n13[&quot;User#58; Merge the pull request&quot;]
+  n14[&quot;User#58; Delete the completed branch&quot;]
+  n15((&quot;Change merged&quot;))
+  n16[&quot;User#58; Close without merging&quot;]
+  n17((&quot;Change closed without merge&quot;))
+  n0 --&gt; n1
+  n1 --&gt; n2
+  n2 --&gt; n3
+  n3 --&gt; n4
+  n4 --&gt; n5
+  n5 --&gt; n6
+  n6 --&gt; n7
+  n6 --&gt; n8
+  n7 --&gt;|&quot;Checks completed&quot;| n9
+  n8 --&gt;|&quot;Review completed&quot;| n9
+  n9 --&gt; n10
+  n10 --&gt; n11
+  n11 --&gt;|&quot;Revise&quot;| n12
+  n12 --&gt;|&quot;Updated commits&quot;| n6
+  n11 --&gt;|&quot;Ready to merge&quot;| n13
+  n13 --&gt; n14
+  n14 --&gt; n15
+  n11 --&gt;|&quot;Close without merging&quot;| n16
+  n16 --&gt; n17
+</pre>
+<h2>Validation warnings</h2>
+<table>
+<thead><tr><th>Severity</th><th>Code</th><th>Entity</th><th>Message</th></tr></thead>
+<tbody>
+<tr><td>WARNING</td><td>OPEN_QUESTION</td><td>qSoloReview</td><td>Who may review a change in a solo-maintained project?</td></tr>
+<tr><td>WARNING</td><td>OPEN_QUESTION</td><td>qRequiredChecks</td><td>Which checks must pass for this repository?</td></tr>
+<tr><td>WARNING</td><td>OPEN_QUESTION</td><td>qMergeRules</td><td>Which approvals, conflict checks and branch-protection rules define readiness to merge?</td></tr>
+<tr><td>WARNING</td><td>OPEN_QUESTION</td><td>qClosedBranch</td><td>Should the branch be retained or deleted after closure without merging?</td></tr>
+</tbody>
+</table>
+<h2>Process</h2>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>githubFlow</td><td>Software change: proposal to merge</td><td>Adapted from GitHub Flow. Review and checks are coordinated for the latest commits; merge, revise or close after assessment.</td></tr>
+</tbody>
+</table>
+<h2>Elements</h2>
+<table>
+<thead><tr><th>ID</th><th>Process</th><th>Type</th><th>Name</th><th>Description</th><th>Parent subprocess</th></tr></thead>
+<tbody>
+<tr><td>proposed</td><td>githubFlow</td><td>START_EVENT</td><td>Change proposed</td><td>A proposed software change is available.</td><td></td></tr>
+<tr><td>describe</td><td>githubFlow</td><td>USER_TASK</td><td>Describe the change</td><td>Record its purpose, scope and acceptance criteria.</td><td></td></tr>
+<tr><td>branch</td><td>githubFlow</td><td>USER_TASK</td><td>Create a branch</td><td>Choose a branch for this change.</td><td></td></tr>
+<tr><td>implement</td><td>githubFlow</td><td>USER_TASK</td><td>Implement the change</td><td>Prepare the change and its tests.</td><td></td></tr>
+<tr><td>publish</td><td>githubFlow</td><td>USER_TASK</td><td>Commit &amp; push changes</td><td>Describe publication of the proposed commits; no push is performed by this model.</td><td></td></tr>
+<tr><td>openPr</td><td>githubFlow</td><td>USER_TASK</td><td>Open a pull request</td><td>Explain the change and request feedback.</td><td></td></tr>
+<tr><td>fork</td><td>githubFlow</td><td>PARALLEL_GATEWAY</td><td>Begin checks and review</td><td>Our adaptation allows both branches to proceed in parallel.</td><td></td></tr>
+<tr><td>checks</td><td>githubFlow</td><td>SERVICE_TASK</td><td>Run automated checks</td><td>Record a completed result, including failure; checks must finish for this revision.</td><td></td></tr>
+<tr><td>review</td><td>githubFlow</td><td>USER_TASK</td><td>Review the change</td><td>Record approval, requested changes or other feedback for this revision.</td><td></td></tr>
+<tr><td>join</td><td>githubFlow</td><td>PARALLEL_GATEWAY</td><td>Collect both results</td><td>Our adaptation waits for both review and checks, even if one reports a problem.</td><td></td></tr>
+<tr><td>assess</td><td>githubFlow</td><td>USER_TASK</td><td>Assess merge readiness</td><td>Consider both results, conflicts, repository rules and whether to continue.</td><td></td></tr>
+<tr><td>decision</td><td>githubFlow</td><td>EXCLUSIVE_GATEWAY</td><td>Next action</td><td>Select exactly one descriptive outcome: ready, revise or close.</td><td></td></tr>
+<tr><td>revise</td><td>githubFlow</td><td>USER_TASK</td><td>Revise, commit &amp; push</td><td>Address feedback, failed checks or conflicts; repeat review and checks for the updated commits.</td><td></td></tr>
+<tr><td>merge</td><td>githubFlow</td><td>USER_TASK</td><td>Merge the pull request</td><td>Describe the authorized merge; no repository changes are made by this model.</td><td></td></tr>
+<tr><td>cleanup</td><td>githubFlow</td><td>USER_TASK</td><td>Delete the completed branch</td><td>Describe post-merge cleanup; this application deletes no branches.</td><td></td></tr>
+<tr><td>merged</td><td>githubFlow</td><td>END_EVENT</td><td>Change merged</td><td>The change is integrated and branch cleanup is complete.</td><td></td></tr>
+<tr><td>closePr</td><td>githubFlow</td><td>USER_TASK</td><td>Close without merging</td><td>Our adaptation records the decision to stop pursuing the change.</td><td></td></tr>
+<tr><td>closed</td><td>githubFlow</td><td>END_EVENT</td><td>Change closed without merge</td><td>The proposed change is not integrated.</td><td></td></tr>
+</tbody>
+</table>
+<h2>Relationships</h2>
+<table>
+<thead><tr><th>ID</th><th>Type</th><th>From</th><th>To</th><th>Label</th><th>Condition</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>gf01</td><td>SEQUENCE_FLOW</td><td>proposed</td><td>describe</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf02</td><td>SEQUENCE_FLOW</td><td>describe</td><td>branch</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf03</td><td>SEQUENCE_FLOW</td><td>branch</td><td>implement</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf04</td><td>SEQUENCE_FLOW</td><td>implement</td><td>publish</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf05</td><td>SEQUENCE_FLOW</td><td>publish</td><td>openPr</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf06</td><td>SEQUENCE_FLOW</td><td>openPr</td><td>fork</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf07</td><td>SEQUENCE_FLOW</td><td>fork</td><td>checks</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf08</td><td>SEQUENCE_FLOW</td><td>fork</td><td>review</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf09</td><td>SEQUENCE_FLOW</td><td>checks</td><td>join</td><td>Checks completed</td><td></td><td>no</td></tr>
+<tr><td>gf10</td><td>SEQUENCE_FLOW</td><td>review</td><td>join</td><td>Review completed</td><td></td><td>no</td></tr>
+<tr><td>gf11</td><td>SEQUENCE_FLOW</td><td>join</td><td>assess</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf12</td><td>SEQUENCE_FLOW</td><td>assess</td><td>decision</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf13</td><td>SEQUENCE_FLOW</td><td>decision</td><td>revise</td><td>Revise</td><td>mergeDecision == &#39;revise&#39;</td><td>no</td></tr>
+<tr><td>gf14</td><td>SEQUENCE_FLOW</td><td>revise</td><td>fork</td><td>Updated commits</td><td></td><td>no</td></tr>
+<tr><td>gf15</td><td>SEQUENCE_FLOW</td><td>decision</td><td>merge</td><td>Ready to merge</td><td>mergeDecision == &#39;ready&#39;</td><td>no</td></tr>
+<tr><td>gf16</td><td>SEQUENCE_FLOW</td><td>merge</td><td>cleanup</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf17</td><td>SEQUENCE_FLOW</td><td>cleanup</td><td>merged</td><td></td><td></td><td>no</td></tr>
+<tr><td>gf18</td><td>SEQUENCE_FLOW</td><td>decision</td><td>closePr</td><td>Close without merging</td><td>mergeDecision == &#39;close&#39;</td><td>no</td></tr>
+<tr><td>gf19</td><td>SEQUENCE_FLOW</td><td>closePr</td><td>closed</td><td></td><td></td><td>no</td></tr>
+</tbody>
+</table>
+<h2>Inputs</h2>
+<table>
+<thead><tr><th>Process</th><th>Name</th><th>Data type</th><th>Required</th></tr></thead>
+<tbody>
+<tr><td>githubFlow</td><td>repositoryName</td><td>STRING</td><td>yes</td></tr>
+<tr><td>githubFlow</td><td>targetBranch</td><td>STRING</td><td>yes</td></tr>
+<tr><td>githubFlow</td><td>changeDescription</td><td>STRING</td><td>yes</td></tr>
+<tr><td>githubFlow</td><td>relatedIssue</td><td>STRING</td><td>no</td></tr>
+</tbody>
+</table>
+<h2>Performers</h2>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>authorRole</td><td>Change author</td><td>HUMAN_ROLE</td><td>Authors the change and responds to feedback.</td></tr>
+<tr><td>reviewerRole</td><td>Reviewer</td><td>HUMAN_ROLE</td><td>Reviews the proposed revision.</td></tr>
+<tr><td>maintainerRole</td><td>Maintainer</td><td>HUMAN_ROLE</td><td>Assesses readiness and decides whether to merge or close.</td></tr>
+<tr><td>ciSystem</td><td>Build system</td><td>SYSTEM</td><td>Produces check results for the proposed revision.</td></tr>
+</tbody>
+</table>
+<h2>Assignments</h2>
+<table>
+<thead><tr><th>Activity</th><th>Performer</th></tr></thead>
+<tbody>
+<tr><td>describe</td><td>authorRole</td></tr>
+<tr><td>branch</td><td>authorRole</td></tr>
+<tr><td>implement</td><td>authorRole</td></tr>
+<tr><td>publish</td><td>authorRole</td></tr>
+<tr><td>openPr</td><td>authorRole</td></tr>
+<tr><td>checks</td><td>ciSystem</td></tr>
+<tr><td>review</td><td>reviewerRole</td></tr>
+<tr><td>assess</td><td>maintainerRole</td></tr>
+<tr><td>revise</td><td>authorRole</td></tr>
+<tr><td>merge</td><td>maintainerRole</td></tr>
+<tr><td>cleanup</td><td>authorRole</td></tr>
+<tr><td>closePr</td><td>maintainerRole</td></tr>
+</tbody>
+</table>
+<h2>Data items</h2>
+<table>
+<thead><tr><th>ID</th><th>Process</th><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>changeSpec</td><td>githubFlow</td><td>Change specification</td><td>Purpose and acceptance criteria.</td></tr>
+<tr><td>branchRecord</td><td>githubFlow</td><td>Branch record</td><td>Working branch and its target.</td></tr>
+<tr><td>commitSet</td><td>githubFlow</td><td>Proposed commits</td><td>The latest revision under review; revision identity is descriptive, not enforced.</td></tr>
+<tr><td>pullRequest</td><td>githubFlow</td><td>Pull request</td><td>Proposal, discussion and current status.</td></tr>
+<tr><td>checkResults</td><td>githubFlow</td><td>Check results</td><td>Completed pass/fail results for the latest revision.</td></tr>
+<tr><td>reviewFeedback</td><td>githubFlow</td><td>Review feedback</td><td>Reviewer response for the latest revision.</td></tr>
+<tr><td>mergeAssessment</td><td>githubFlow</td><td>Merge assessment</td><td>Ready, revise or close, with a reason.</td></tr>
+<tr><td>repositoryOutcome</td><td>githubFlow</td><td>Repository outcome</td><td>Merged and cleaned up, or closed without merging.</td></tr>
+</tbody>
+</table>
+<h2>Data associations</h2>
+<table>
+<thead><tr><th>Activity</th><th>Data item</th><th>Direction</th></tr></thead>
+<tbody>
+<tr><td>describe</td><td>changeSpec</td><td>OUTPUT</td></tr>
+<tr><td>branch</td><td>changeSpec</td><td>INPUT</td></tr>
+<tr><td>branch</td><td>branchRecord</td><td>OUTPUT</td></tr>
+<tr><td>implement</td><td>changeSpec</td><td>INPUT</td></tr>
+<tr><td>implement</td><td>branchRecord</td><td>INPUT</td></tr>
+<tr><td>implement</td><td>commitSet</td><td>OUTPUT</td></tr>
+<tr><td>publish</td><td>commitSet</td><td>INPUT</td></tr>
+<tr><td>openPr</td><td>commitSet</td><td>INPUT</td></tr>
+<tr><td>openPr</td><td>pullRequest</td><td>OUTPUT</td></tr>
+<tr><td>checks</td><td>commitSet</td><td>INPUT</td></tr>
+<tr><td>checks</td><td>checkResults</td><td>OUTPUT</td></tr>
+<tr><td>review</td><td>commitSet</td><td>INPUT</td></tr>
+<tr><td>review</td><td>pullRequest</td><td>INPUT</td></tr>
+<tr><td>review</td><td>reviewFeedback</td><td>OUTPUT</td></tr>
+<tr><td>assess</td><td>checkResults</td><td>INPUT</td></tr>
+<tr><td>assess</td><td>reviewFeedback</td><td>INPUT</td></tr>
+<tr><td>assess</td><td>pullRequest</td><td>INPUT</td></tr>
+<tr><td>assess</td><td>mergeAssessment</td><td>OUTPUT</td></tr>
+<tr><td>revise</td><td>mergeAssessment</td><td>INPUT</td></tr>
+<tr><td>revise</td><td>checkResults</td><td>INPUT</td></tr>
+<tr><td>revise</td><td>reviewFeedback</td><td>INPUT</td></tr>
+<tr><td>revise</td><td>commitSet</td><td>OUTPUT</td></tr>
+<tr><td>revise</td><td>pullRequest</td><td>OUTPUT</td></tr>
+<tr><td>merge</td><td>mergeAssessment</td><td>INPUT</td></tr>
+<tr><td>merge</td><td>commitSet</td><td>INPUT</td></tr>
+<tr><td>merge</td><td>pullRequest</td><td>OUTPUT</td></tr>
+<tr><td>cleanup</td><td>branchRecord</td><td>INPUT</td></tr>
+<tr><td>cleanup</td><td>repositoryOutcome</td><td>OUTPUT</td></tr>
+<tr><td>closePr</td><td>mergeAssessment</td><td>INPUT</td></tr>
+<tr><td>closePr</td><td>pullRequest</td><td>OUTPUT</td></tr>
+<tr><td>closePr</td><td>repositoryOutcome</td><td>OUTPUT</td></tr>
+</tbody>
+</table>
+<h2>Open questions</h2>
+<table>
+<thead><tr><th>ID</th><th>Process</th><th>Element (blank means process-level)</th><th>Question</th></tr></thead>
+<tbody>
+<tr><td>qSoloReview</td><td>githubFlow</td><td>review</td><td>Who may review a change in a solo-maintained project?</td></tr>
+<tr><td>qRequiredChecks</td><td>githubFlow</td><td>checks</td><td>Which checks must pass for this repository?</td></tr>
+<tr><td>qMergeRules</td><td>githubFlow</td><td>assess</td><td>Which approvals, conflict checks and branch-protection rules define readiness to merge?</td></tr>
+<tr><td>qClosedBranch</td><td>githubFlow</td><td>closePr</td><td>Should the branch be retained or deleted after closure without merging?</td></tr>
+</tbody>
+</table>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@12.3.0/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, securityLevel: 'strict', flowchart: { htmlLabels: false } });
+</script>
+</body>
+</html>
