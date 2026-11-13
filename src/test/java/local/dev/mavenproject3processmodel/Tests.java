@@ -12,6 +12,7 @@ public final class Tests {
         checks += HtmlChecks.run();
         checks += GitHubFlowChecks.run();
         checks += NestedChecks.run();
+        checks += NestedExampleChecks.run();
         System.out.println("Passed " + checks + " checks");
     }
 }
