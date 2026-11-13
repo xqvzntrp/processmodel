@@ -1,0 +1,83 @@
+package local.dev.mavenproject3processmodel;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Comparator;
+import local.dev.mavenproject3processmodel.examples.OnboardingExample;
+import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
+import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
+
+final class DemoChecks {
+    private static int checks;
+    private DemoChecks() { }
+    private record Run(int status, String output, String error) { }
+    private static Run run(String... args) {
+        var stdout = new ByteArrayOutputStream();
+        var stderr = new ByteArrayOutputStream();
+        try (var out = new PrintStream(stdout, true, StandardCharsets.UTF_8);
+             var err = new PrintStream(stderr, true, StandardCharsets.UTF_8)) {
+            int status = Mavenproject3processmodel.run(args, out, err);
+            return new Run(status, stdout.toString(StandardCharsets.UTF_8), stderr.toString(StandardCharsets.UTF_8));
+        }
+    }
+    private static void check(boolean condition, String message) {
+        if (!condition) throw new AssertionError(message);
+        checks++;
+    }
+    static int run() throws Exception {
+        var model = OnboardingExample.model();
+        var codec = new ProcessModelXml();
+        var validation = new ProcessModelValidator().validate(model);
+        check(validation.valid() && validation.diagnostics().size() == 2, "example is valid with two explicit unresolved questions");
+        check(model.elements().size() == 13 && model.relationships().size() == 15, "worked example graph");
+        check(codec.read(Path.of("examples/onboarding.process.xml")).equals(model), "checked-in rich model matches example");
+        check(codec.toXml(model).equals(Files.readString(Path.of("examples/onboarding.process.xml"))), "deterministic saved example");
+        Path dir = Files.createTempDirectory("process-demo-");
+        try {
+            Path input = dir.resolve("onboarding é.process.xml");
+            Run demo = run("demo", input.toString());
+            check(demo.status() == 0 && demo.error().isEmpty(), "demo succeeds with Unicode output path");
+            check(demo.output().contains("Saved and reloaded") && demo.output().contains("warnings: 2"), "demo reports persisted model and warnings");
+            check(codec.read(input).equals(model), "demo saves complete rich model");
+            byte[] before = Files.readAllBytes(input);
+            Run validate = run("validate", input.toString());
+            check(validate.status() == 0 && validate.output().contains("OPEN_QUESTION"), "validate accepts incomplete business knowledge");
+            check(Arrays.equals(before, Files.readAllBytes(input)), "validation does not change source");
+            Path output = dir.resolve("copy.xml");
+            check(run("copy", input.toString(), output.toString()).status() == 0 && codec.read(output).equals(model), "copy reloads persisted source");
+            check(Arrays.equals(before, Files.readAllBytes(input)), "copy does not change source");
+            check(run("copy", input.toString(), input.toString()).status() != 0, "same path copy rejected");
+            Path symlink = dir.resolve("symlink.xml"); Files.createSymbolicLink(symlink, input);
+            check(run("copy", input.toString(), symlink.toString()).status() != 0, "same-file symlink copy rejected");
+            Path hardlink = dir.resolve("hardlink.xml"); Files.createLink(hardlink, input);
+            check(run("copy", input.toString(), hardlink.toString()).status() != 0, "same-file hard-link copy rejected");
+            for (String[] args : new String[][]{{"unknown"}, {"validate"}, {"demo", "one", "extra"}, {"copy", "one"}})
+                check(run(args).status() == 2 && run(args).error().contains("Usage:"), "invalid arguments diagnostic");
+            check(run("validate", dir.resolve("missing.xml").toString()).status() == 1, "missing file diagnostic");
+            check(run("demo", dir.resolve("absent/model.xml").toString()).status() == 1, "missing output directory diagnostic");
+            for (String bad : new String[]{"<broken>", codec.toXml(model).replace("<targetElementId>review</targetElementId>", "<targetElementId>absent</targetElementId>")}) {
+                Path invalid = dir.resolve("invalid.xml"); Files.writeString(invalid, bad);
+                Files.writeString(output, "keep existing");
+                Run failure = run("copy", invalid.toString(), output.toString());
+                check(failure.status() == 1 && failure.error().startsWith("Process model failed:"), "concise invalid-source diagnostic");
+                check(Files.readString(output).equals("keep existing"), "failed copy preserves output");
+            }
+            Files.createDirectory(dir.resolve("target"));
+            var process = new ProcessBuilder(Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                "-cp", Path.of("target/classes").toAbsolutePath().toString(), Mavenproject3processmodel.class.getName())
+                .directory(dir.toFile()).redirectErrorStream(true).start();
+            String console = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            check(process.waitFor() == 0 && console.contains("Saved and reloaded target/onboarding.process.xml"), "real no-argument launcher works");
+            check(codec.read(dir.resolve("target/onboarding.process.xml")).equals(model), "no-argument launcher output round trip");
+        } finally {
+            try (var paths = Files.walk(dir)) {
+                for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(path);
+            }
+        }
+        return checks;
+    }
+}

@@ -8,6 +8,7 @@ public final class Tests {
         int checks = 1;
         checks += ModelChecks.run();
         checks += PersistenceChecks.run();
+        checks += DemoChecks.run();
         System.out.println("Passed " + checks + " checks");
     }
 }

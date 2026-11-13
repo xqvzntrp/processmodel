@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?><processModel xmlns="urn:local.dev:processmodel:1" version="1">
+  <processes>
+    <processDefinition>
+      <processId>onboarding</processId>
+      <name>Employee onboarding</name>
+      <description>Review a request, then prepare HR records, accounts and equipment in parallel.</description>
+    </processDefinition>
+  </processes>
+  <elements>
+    <processElement>
+      <elementId>submitted</elementId>
+      <processId>onboarding</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Request received</name>
+      <description>Onboarding request is available.</description>
+    </processElement>
+    <processElement>
+      <elementId>review</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Review request</name>
+      <description>Check employee details and start date.</description>
+    </processElement>
+    <processElement>
+      <elementId>decision</elementId>
+      <processId>onboarding</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Review outcome</name>
+      <description>Approved, declined or needs correction.</description>
+    </processElement>
+    <processElement>
+      <elementId>correct</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Request corrections</name>
+      <description>Ask the requester to correct the information.</description>
+    </processElement>
+    <processElement>
+      <elementId>decline</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Notify requester of decline</name>
+      <description>Communicate the decision.</description>
+    </processElement>
+    <processElement>
+      <elementId>declined</elementId>
+      <processId>onboarding</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Request declined</name>
+      <description>No preparation work begins.</description>
+    </processElement>
+    <processElement>
+      <elementId>fork</elementId>
+      <processId>onboarding</processId>
+      <elementType>PARALLEL_GATEWAY</elementType>
+      <name>Begin preparation</name>
+      <description>Start three preparation branches.</description>
+    </processElement>
+    <processElement>
+      <elementId>hr</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Prepare HR records</name>
+      <description>Create the employee record.</description>
+    </processElement>
+    <processElement>
+      <elementId>accounts</elementId>
+      <processId>onboarding</processId>
+      <elementType>SERVICE_TASK</elementType>
+      <name>Provision accounts</name>
+      <description>Describe the account-provisioning activity; no service is invoked.</description>
+    </processElement>
+    <processElement>
+      <elementId>equipment</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Prepare equipment</name>
+      <description>Arrange equipment for the employee.</description>
+    </processElement>
+    <processElement>
+      <elementId>join</elementId>
+      <processId>onboarding</processId>
+      <elementType>PARALLEL_GATEWAY</elementType>
+      <name>Preparation complete</name>
+      <description>Intended to join all three preparation branches.</description>
+    </processElement>
+    <processElement>
+      <elementId>confirm</elementId>
+      <processId>onboarding</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Confirm readiness</name>
+      <description>Confirm all preparation is complete.</description>
+    </processElement>
+    <processElement>
+      <elementId>ready</elementId>
+      <processId>onboarding</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Ready for first day</name>
+      <description>Onboarding preparation is complete.</description>
+    </processElement>
+  </elements>
+  <relationships>
+    <processRelationship>
+      <relationshipId>f01</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>submitted</sourceElementId>
+      <targetElementId>review</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f02</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>review</sourceElementId>
+      <targetElementId>decision</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f03</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>correct</targetElementId>
+      <name>Needs correction</name>
+      <conditionExpression>reviewResult == 'incomplete'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f04</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>correct</sourceElementId>
+      <targetElementId>review</targetElementId>
+      <name>Resubmitted</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f05</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>decline</targetElementId>
+      <name>Declined</name>
+      <conditionExpression>reviewResult == 'declined'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f06</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decline</sourceElementId>
+      <targetElementId>declined</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f07</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>fork</targetElementId>
+      <name>Approved</name>
+      <conditionExpression>reviewResult == 'approved'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f08</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>fork</sourceElementId>
+      <targetElementId>hr</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f09</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>fork</sourceElementId>
+      <targetElementId>accounts</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f10</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>fork</sourceElementId>
+      <targetElementId>equipment</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f11</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>hr</sourceElementId>
+      <targetElementId>join</targetElementId>
+      <name>HR ready</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f12</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>accounts</sourceElementId>
+      <targetElementId>join</targetElementId>
+      <name>Accounts ready</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f13</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>equipment</sourceElementId>
+      <targetElementId>join</targetElementId>
+      <name>Equipment ready</name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f14</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>join</sourceElementId>
+      <targetElementId>confirm</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>f15</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>confirm</sourceElementId>
+      <targetElementId>ready</targetElementId>
+      <name></name>
+      <isDefault>false</isDefault>
+    </processRelationship>
+  </relationships>
+  <inputs>
+    <processInput>
+      <processId>onboarding</processId>
+      <inputName>employeeName</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>onboarding</processId>
+      <inputName>startDate</inputName>
+      <dataType>DATE</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>onboarding</processId>
+      <inputName>remoteWorker</inputName>
+      <dataType>BOOLEAN</dataType>
+      <isRequired>false</isRequired>
+    </processInput>
+  </inputs>
+  <performers>
+    <performerDefinition>
+      <performerId>hrRole</performerId>
+      <name>HR coordinator</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Reviews requests and prepares HR records.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>managerRole</performerId>
+      <name>Hiring manager</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Supplies corrections and confirms readiness.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>itRole</performerId>
+      <name>IT coordinator</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Prepares equipment.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>identitySystem</performerId>
+      <name>Identity system</name>
+      <performerType>SYSTEM</performerType>
+      <description>Provisioning system to be confirmed.</description>
+    </performerDefinition>
+  </performers>
+  <assignments>
+    <activityAssignment>
+      <elementId>review</elementId>
+      <performerId>hrRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>correct</elementId>
+      <performerId>managerRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>decline</elementId>
+      <performerId>hrRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>hr</elementId>
+      <performerId>hrRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>accounts</elementId>
+      <performerId>identitySystem</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>equipment</elementId>
+      <performerId>itRole</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>confirm</elementId>
+      <performerId>managerRole</performerId>
+    </activityAssignment>
+  </assignments>
+  <dataItems>
+    <processDataItem>
+      <dataItemId>requestData</dataItemId>
+      <processId>onboarding</processId>
+      <name>Onboarding request</name>
+      <description>Employee details and proposed start date.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>hrData</dataItemId>
+      <processId>onboarding</processId>
+      <name>HR record</name>
+      <description>Prepared employee record.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>accountData</dataItemId>
+      <processId>onboarding</processId>
+      <name>Account record</name>
+      <description>Provisioned account details.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>equipmentData</dataItemId>
+      <processId>onboarding</processId>
+      <name>Equipment record</name>
+      <description>Equipment allocation details.</description>
+    </processDataItem>
+  </dataItems>
+  <dataAssociations>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>requestData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>correct</elementId>
+      <dataItemId>requestData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>hr</elementId>
+      <dataItemId>requestData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>accounts</elementId>
+      <dataItemId>requestData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>equipment</elementId>
+      <dataItemId>requestData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>hr</elementId>
+      <dataItemId>hrData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>accounts</elementId>
+      <dataItemId>accountData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>equipment</elementId>
+      <dataItemId>equipmentData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>hrData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>accountData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>equipmentData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+  </dataAssociations>
+  <openQuestions>
+    <processOpenQuestion>
+      <questionId>qStartDate</questionId>
+      <processId>onboarding</processId>
+      <description>Who approves exceptions to the requested start date?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>qIdentity</questionId>
+      <processId>onboarding</processId>
+      <elementId>accounts</elementId>
+      <description>Which identity provider will provision the accounts?</description>
+    </processOpenQuestion>
+  </openQuestions>
+</processModel>
