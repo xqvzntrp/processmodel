@@ -76,16 +76,23 @@ public final class ProcessModelValidator {
             for (Record record : records) checkText(record);
             for (var process : model.processes()) {
                 name(process.name(), process.processId());
-                boolean start = model.elements().stream().anyMatch(e -> Objects.equals(e.processId(), process.processId()) && e.elementType() == ElementType.START_EVENT);
-                boolean end = model.elements().stream().anyMatch(e -> Objects.equals(e.processId(), process.processId()) && e.elementType() == ElementType.END_EVENT);
-                if (!start || !end) error("EVENTS_REQUIRED", process.processId(), "Process needs at least one start and one end event");
+                boolean start = model.elements().stream().anyMatch(e -> Objects.equals(e.processId(), process.processId()) && e.parentSubprocessId() == null && e.elementType() == ElementType.START_EVENT);
+                boolean end = model.elements().stream().anyMatch(e -> Objects.equals(e.processId(), process.processId()) && e.parentSubprocessId() == null && e.elementType() == ElementType.END_EVENT);
+                if (!start || !end) error("EVENTS_REQUIRED", process.processId(), "Process scope needs at least one direct start and one direct end event");
             }
             for (var element : model.elements()) {
                 owner(element.processId(), element.elementId()); name(element.name(), element.elementId());
                 if (element.elementType() == null) error("ELEMENT_TYPE_REQUIRED", element.elementId(), "Element type is required");
-                if (element.elementType() == ElementType.SUB_PROCESS || element.parentSubprocessId() != null)
-                    error("SUBPROCESS_UNSUPPORTED", element.elementId(), "Subprocesses and parent membership are outside version 1");
+                if (element.parentSubprocessId() != null) {
+                    var parent = elements.get(element.parentSubprocessId());
+                    if (parent == null) error("UNKNOWN_PARENT", element.elementId(), "Unknown parent subprocess: " + element.parentSubprocessId());
+                    else {
+                        if (parent.elementType() != ElementType.SUB_PROCESS) error("INVALID_PARENT_TYPE", element.elementId(), "Parent must be a subprocess");
+                        if (!Objects.equals(parent.processId(), element.processId())) error("PARENT_PROCESS_MISMATCH", element.elementId(), "Parent and child must belong to the same process");
+                    }
+                }
             }
+            hierarchy(model);
             var defaults = new HashSet<String>();
             var outgoing = new HashMap<String, Integer>();
             for (var flow : model.relationships()) outgoing.merge(flow.sourceElementId(), 1, Integer::sum);
@@ -99,6 +106,8 @@ public final class ProcessModelValidator {
                 if (target == null) error("UNKNOWN_TARGET", id, "Unknown target: " + flow.targetElementId());
                 if (source != null && target != null && !Objects.equals(source.processId(), target.processId()))
                     error("CROSS_PROCESS_FLOW", id, "Sequence flows cannot cross processes");
+                if (source != null && target != null && !Objects.equals(source.parentSubprocessId(), target.parentSubprocessId()))
+                    error("CROSS_SCOPE_FLOW", id, "Sequence flows must connect elements in the same parent scope");
                 if (source != null && source.elementType() == ElementType.END_EVENT || target != null && target.elementType() == ElementType.START_EVENT)
                     error("EVENT_DIRECTION", id, "Flows cannot leave end events or enter start events");
                 boolean conditional = flow.conditionExpression() != null && !flow.conditionExpression().isBlank();
@@ -149,6 +158,36 @@ public final class ProcessModelValidator {
                 }
                 if (question.description() == null || question.description().isBlank()) error("QUESTION_TEXT_REQUIRED", question.questionId(), "Clarification question text is required");
                 warning("OPEN_QUESTION", question.questionId(), question.description());
+            }
+        }
+        private record Scope(String processId, String parentId) { }
+        private void hierarchy(ProcessModel model) {
+            // Iterative traversal avoids imposing a recursion-depth limit on containment.
+            var completed = new HashSet<String>();
+            for (var element : model.elements()) {
+                var path = new HashSet<String>();
+                String current = element.elementId();
+                while (current != null && !completed.contains(current)) {
+                    if (!path.add(current)) {
+                        error("SUBPROCESS_CYCLE", current, "Containment cannot contain a direct or indirect cycle");
+                        break;
+                    }
+                    var node = elements.get(current);
+                    current = node == null ? null : node.parentSubprocessId();
+                }
+                completed.addAll(path);
+            }
+            var events = new HashMap<Scope, int[]>();
+            for (var element : model.elements()) {
+                var count = events.computeIfAbsent(new Scope(element.processId(), element.parentSubprocessId()), key -> new int[2]);
+                if (element.elementType() == ElementType.START_EVENT) count[0]++;
+                if (element.elementType() == ElementType.END_EVENT) count[1]++;
+            }
+            for (var element : model.elements()) {
+                if (element.elementType() != ElementType.SUB_PROCESS || element.elementId() == null) continue;
+                var count = events.getOrDefault(new Scope(element.processId(), element.elementId()), new int[2]);
+                if (count[0] != 1 || count[1] < 1) error("SUBPROCESS_EVENTS_REQUIRED", element.elementId(),
+                    "Each subprocess needs exactly one direct start and at least one direct end event");
             }
         }
         private void checkText(Record record) {

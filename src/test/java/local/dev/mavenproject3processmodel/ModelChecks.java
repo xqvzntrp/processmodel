@@ -58,8 +58,8 @@ final class ModelChecks {
         rejects("INVALID_ID", f -> f.elements.add(new ProcessElement(null, "p", ElementType.TASK, "Missing ID", null, null)));
         rejects("UNKNOWN_PROCESS", f -> f.elements.add(new ProcessElement("orphan", "absent", ElementType.TASK, "Orphan", null, null)));
         rejects("ELEMENT_TYPE_REQUIRED", f -> f.elements.add(new ProcessElement("unknown", "p", null, "Unknown", null, null)));
-        rejects("SUBPROCESS_UNSUPPORTED", f -> f.elements.add(new ProcessElement("sub", "p", ElementType.SUB_PROCESS, "Subprocess", null, null)));
-        rejects("SUBPROCESS_UNSUPPORTED", f -> f.elements.add(new ProcessElement("child", "p", ElementType.TASK, "Child", null, "t")));
+        rejects("SUBPROCESS_EVENTS_REQUIRED", f -> f.elements.add(new ProcessElement("sub", "p", ElementType.SUB_PROCESS, "Subprocess", null, null)));
+        rejects("INVALID_PARENT_TYPE", f -> f.elements.add(new ProcessElement("child", "p", ElementType.TASK, "Child", null, "t")));
         for (var type : List.of(RelationshipType.MESSAGE_FLOW, RelationshipType.ASSOCIATION))
             rejects("RELATIONSHIP_UNSUPPORTED", f -> f.flows.add(new ProcessRelationship("other", type, "s", "t", "", null, false)));
         rejects("UNKNOWN_SOURCE", f -> f.flows.add(new ProcessRelationship("bad", RelationshipType.SEQUENCE_FLOW, "absent", "t", "", null, false)));
