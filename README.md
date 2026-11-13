@@ -78,15 +78,22 @@ All records and enums are in `local.dev.mavenproject3processmodel.model`.
 | openQuestions | Process-level or element-level unresolved clarification questions |
 
 Version 1 accepts exactly one process; plain start/end events; generic, user and
-service tasks; exclusive/parallel gateways; and sequence flows. IDs are globally
+service tasks; exclusive/parallel gateways; embedded subprocesses with arbitrary
+nesting; and sequence flows. IDs are globally
 unique across processes, elements, relationships, performers, data items and
 questions. IDs use `[A-Za-z_][A-Za-z0-9_.-]*`. Input names are unique per process;
 assignment pairs and activity/data/direction triples cannot be duplicated.
 
-The ZIP's SUB_PROCESS, MESSAGE_FLOW and ASSOCIATION enum values remain available
-for identifying unsupported content, but version 1 validation rejects them.
-Parent-subprocess membership is also rejected. Multiple processes and subprocess
-hierarchy are deferred rather than flattened. Input types are STRING, NUMBER,
+SUB_PROCESS uses `parentSubprocessId` to form an acyclic hierarchy in the same
+process. Root elements have a null parent. Each embedded subprocess may contain
+ordinary elements and other subprocesses, with no one-level restriction. Sequence
+flows connect only elements in the same scope; parent flows connect to the
+subprocess node rather than its internal events. Each subprocess needs exactly one
+direct start and at least one direct end event. The main scope needs at least one
+of each. See [nested scope rules](examples/NESTED-SUBPROCESSES.md).
+
+MESSAGE_FLOW and ASSOCIATION remain identifiable enum values but are unsupported.
+Multiple processes and reusable called processes are not implemented. Input types are STRING, NUMBER,
 BOOLEAN, DATE and TIMESTAMP. Only their definitions are stored; no values are
 parsed or evaluated against those types.
 
@@ -145,14 +152,14 @@ fields and types are rejected. See [FORMAT.md](FORMAT.md) for the exact contract
 questions. [onboarding.process.xml](examples/onboarding.process.xml) is a committed,
 deterministically generated fixture checked against the Java example.
 
-Verified on Java 21.0.9 with Maven 3.8.7: **201 checks**. The harness covers model
+Verified on Java 21.0.9 with Maven 3.8.7: **280 checks**. The harness covers model
 validation, immutable lists, diagnostic severity, all input types, supported node
 types, XML round trips, optional fields, Unicode/whitespace, unknown content,
 DOCTYPE/entity/network-reference rejection, file errors and the real no-argument
 launcher. It also verifies same-file protection and existing-output preservation
 when copying invalid input.
 
-Maven runs the harness under `process-model-checks`; look for `Passed 201 checks`.
+Maven runs the harness under `process-model-checks`; look for `Passed 280 checks`.
 Surefire reports zero JUnit tests because this is a separate plain Java harness.
 A failing check fails Maven before packaging/installing. `mvn -DskipTests package`
 skips this harness when explicitly requested.
@@ -163,11 +170,14 @@ See [DESIGN.md](DESIGN.md) for the initial decisions and commit plan.
 ## Basic read-only HTML
 
 `ProcessModelHtml` reads the saved `.process.xml` through the secure parser. It
-produces one Mermaid flowchart and plain bordered tables for every model collection
+produces a Mermaid flowchart for the main scope and one for each embedded
+subprocess, plus plain bordered tables for every model collection
 and validation warnings. No editing controls, navigation widgets or application
 framework are included. HTML export does not change the XML or execute conditions.
 
-Events use circles, tasks rectangles, and gateways diamonds with X/+ markers.
+Events use circles, tasks rectangles, gateways diamonds with X/+ markers, and
+subprocesses labeled subroutine boxes. Each subprocess's contents appear in a
+separate section with its parent context; no nested UI controls are added.
 User/service tasks are marked in their labels. Flow names and default-flow markers
 are displayed. Disconnected nodes and cycles are retained. Full condition text is
 shown in the relationships table; performers and data dependencies stay in tables
@@ -215,3 +225,20 @@ This generates `target/github-flow.process.xml` and `target/github-flow.html`.
 NetBeans Run File on `GitHubFlowExample.java` does the same. Run Project still
 selects onboarding. The committed [XML](examples/github-flow.process.xml) and
 [basic HTML](examples/github-flow.html) are kept reproducible by the test harness.
+
+
+## Nested subprocess example
+
+[Nested software-validation walkthrough](examples/NESTED-SUBPROCESSES.md) derives
+from the GitHub Flow example. “Validate proposed change” contains “Verify build”,
+which contains compilation, conditional testing and check-result recording.
+
+```sh
+java -cp target/classes local.dev.mavenproject3processmodel.examples.NestedChangeExample
+```
+
+Open `target/nested-change.html` to see the three basic scope diagrams and full
+model tables. The saved source is `target/nested-change.process.xml`. NetBeans Run
+File on `NestedChangeExample.java` works without arguments. Run Project remains
+onboarding. The committed [XML](examples/nested-change.process.xml) and
+[HTML](examples/nested-change.html) are checked for reproducibility.

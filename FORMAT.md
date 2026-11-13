@@ -45,3 +45,22 @@ DOCTYPE is forbidden. External general/parameter entities, DTD loading, external
 schema access and XInclude processing are disabled. A rejecting entity resolver
 provides another barrier to external resources. Invalid/unsupported XML and invalid
 models produce IllegalArgumentException; file failures produce IOException.
+
+
+## Embedded subprocess scopes
+
+Version 1 retains its flat record lists: XML elements are not physically nested
+according to process containment. A ProcessElement with type SUB_PROCESS may own
+children via their parentSubprocessId field. A null parent means main scope; an
+empty parent ID is invalid. Parent references must resolve to subprocesses in the
+same process and cannot form cycles. The same representation works at every depth.
+
+A sequence flow's endpoints must share a direct parent scope. Subprocess boundary
+crossing is represented by the subprocess activity in its parent scope, not by
+arrows to internal children. Subprocess scopes require exactly one direct start
+and at least one direct end; the root requires at least one direct start/end.
+Descendant events do not satisfy their ancestors' requirements.
+
+This extends the reader/validator's supported subset without changing existing
+fields, enums, namespace or version. Flat fixtures remain unchanged. Earlier program
+revisions do not support these records semantically and will reject nested files.

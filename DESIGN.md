@@ -13,10 +13,14 @@ existing BPMN → Mermaid → HTML pipeline.
 ## Scope and invariants
 
 - Exactly one process in version 1; keep the list-based API to match the ZIP.
-- Plain start/end events, generic/user/service tasks, exclusive/parallel gateways.
-- Keep the ZIP's SUB_PROCESS, MESSAGE_FLOW and ASSOCIATION enum values, but report
-  unsupported content as structural errors. Parent-subprocess membership is also
-  unsupported. Never silently flatten or omit these constructs.
+- Plain start/end events, generic/user/service tasks, exclusive/parallel gateways,
+  and embedded subprocesses with arbitrary nesting.
+- Parent membership must identify a subprocess in the same process and form an
+  acyclic hierarchy. Flows stay within their direct scope. Main-scope events cannot
+  be supplied by descendants. Each subprocess needs exactly one direct start and
+  at least one direct end event. Root scope retains at least one of each.
+- Keep MESSAGE_FLOW and ASSOCIATION identifiable but unsupported. Multiple processes
+  and called/reusable processes are outside scope. Never silently flatten content.
 - Keep performers, activity assignments, typed inputs, process data items,
   input/output data associations and process/element clarification questions.
 - Copy every aggregate list defensively. IDs are globally unique ASCII NCNames
@@ -113,3 +117,31 @@ Planned and tested commits:
 The existing schema, validator, HTML styling and default onboarding launcher remain
 unchanged. The example is a separate Java main class with an optional XML output
 path. It saves/reloads XML before generating the basic HTML from the saved file.
+
+
+## Nested subprocess continuation
+
+The original first-version rejection of subprocesses is superseded by embedded
+scope support. The records and XML field layout are unchanged. Version 1 already
+represented SUB_PROCESS and parentSubprocessId; accepting them is an additive
+supported-subset extension, not a new serialization shape. Existing flat files
+retain identical XML and HTML output. Older application revisions reject nested
+models rather than silently flatten them.
+
+Containment validation and scope ordering are iterative, with no one-level limit.
+Metadata remains process-owned: performers, data items and inputs are not cloned
+per subprocess. Assignments/data dependencies can refer to a subprocess activity;
+children have their own explicit bindings. There is no runtime variable scope,
+parameter passing, call mechanism, interruption, token-flow or completion engine.
+
+Four commits, tested before committing:
+
+1. `feat: validate nested embedded subprocess scopes` — 229 checks.
+2. `feat: visualize nested subprocesses by scope` — 263 checks.
+3. `feat: add a nested software-validation example` — 280 checks.
+4. `docs: explain nested subprocess scopes and examples` — full suite and demos.
+
+Validation tests cover 256 nesting levels. XML/HTML tests cover 64 nested scopes,
+node/flow preservation, per-diagram endpoint declarations, cycle rejection, scope
+entry/exit rules and escaping. The worked example contains two embedded levels.
+Browser rendering remains unverified by the agent due to local-file preview policy.

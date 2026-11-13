@@ -116,4 +116,8 @@ Project (F6)** retains onboarding as its default. No action mapping was changed.
 
 Committed files: [XML](github-flow.process.xml) and [basic HTML](github-flow.html).
 The regression suite checks both against the specification and saved-XML export.
-With the new example, the full suite passes **201 checks**.
+With the new example, the full suite passes **280 checks**.
+
+
+A separate [nested adaptation](NESTED-SUBPROCESSES.md) groups validation and build
+verification into embedded subprocesses. This flat example remains unchanged.
