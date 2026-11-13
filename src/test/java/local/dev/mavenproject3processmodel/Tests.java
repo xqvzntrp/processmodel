@@ -10,6 +10,7 @@ public final class Tests {
         checks += PersistenceChecks.run();
         checks += DemoChecks.run();
         checks += HtmlChecks.run();
+        checks += GitHubFlowChecks.run();
         System.out.println("Passed " + checks + " checks");
     }
 }
