@@ -9,6 +9,7 @@ public final class Tests {
         checks += ModelChecks.run();
         checks += PersistenceChecks.run();
         checks += DemoChecks.run();
+        checks += HtmlChecks.run();
         System.out.println("Passed " + checks + " checks");
     }
 }
