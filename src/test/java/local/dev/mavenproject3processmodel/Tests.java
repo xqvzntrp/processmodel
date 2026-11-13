@@ -7,6 +7,7 @@ public final class Tests {
         if (Runtime.version().feature() < 21) throw new AssertionError("Java 21 or newer required");
         int checks = 1;
         checks += ModelChecks.run();
+        checks += PersistenceChecks.run();
         System.out.println("Passed " + checks + " checks");
     }
 }
