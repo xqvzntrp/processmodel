@@ -66,6 +66,7 @@ The default run reports:
 
 ```text
 Saved and reloaded target/onboarding.process.xml
+Saved HTML target/onboarding.html
 Process: Employee onboarding
 Elements: 13; relationships: 15
 Inputs: 3; performers: 4; assignments: 7
@@ -78,3 +79,17 @@ WARNING OPEN_QUESTION [qIdentity]: Which identity provider will provision the ac
 Edit a copy of the saved XML and run `validate` to inspect its diagnostics. For
 example, changing a targetElementId to `absent` produces UNKNOWN_TARGET. The original
 fixture is protected by a regression check against the Java model.
+
+
+## Basic HTML view
+
+After running the demo, open `target/onboarding.html` in your browser. It shows the
+control-flow diagram followed by plain tables of the model data and the two open
+questions. It is read-only. Internet access is needed for the Mermaid flowchart;
+the tables are embedded in the HTML.
+
+To visualize the committed XML without regenerating the Java example:
+
+```sh
+java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar html examples/onboarding.process.xml target/onboarding.html
+```

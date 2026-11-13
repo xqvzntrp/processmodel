@@ -74,3 +74,23 @@ launcher. The final documentation commit reruns all 110 checks and the applicati
 NetBeans Run uses a project action mapping; no-argument Run File uses the same demo.
 The executable JAR has also been exercised. No source history was rewritten or
 pushed, and the separate BPMN reader project was not modified.
+
+
+## Basic read-only HTML continuation
+
+A direct rich-XML visual projection is separate from future BPMN adaptation. The
+HTML exporter reads the saved project XML, then emits a Mermaid control-flow view
+and static tables for all nine collections and warnings. It adds no editor or
+execution behavior. Java remains dependency-free; the browser loads a pinned
+Mermaid renderer from a CDN. Export never writes the source XML.
+
+Planned continuation commits, each verified before committing:
+
+1. `feat: export saved process models as basic read-only HTML` — 155 checks.
+2. `feat: generate basic HTML from the saved demo model` — 166 checks.
+3. `docs: explain basic read-only HTML export` — full suite and application run.
+
+The default NetBeans/JAR demo generates XML and HTML. An explicit `html INPUT OUTPUT`
+command renders saved models. Validation and XML copy retain their existing roles.
+The browser preview tool cannot open local file URLs, so rendering inspection is
+left to a normal browser; automated export and command checks pass.
