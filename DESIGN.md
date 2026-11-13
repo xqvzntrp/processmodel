@@ -94,3 +94,22 @@ The default NetBeans/JAR demo generates XML and HTML. An explicit `html INPUT OU
 command renders saved models. Validation and XML copy retain their existing roles.
 The browser preview tool cannot open local file URLs, so rendering inspection is
 left to a normal browser; automated export and command checks pass.
+
+
+## GitHub Flow example continuation
+
+The second example is an adaptation of GitHub's documented GitHub Flow. Its
+parallel coordination, readiness assessment and no-merge closure branch are explicit
+local modeling decisions. The accompanying walkthrough distinguishes them from
+the source and documents the absence of commit-versioned data or approval freshness
+checks. No workflow is executed and no repository policy is asserted.
+
+Planned and tested commits:
+
+1. `feat: model a documented GitHub Flow adaptation` — 187 checks.
+2. `feat: save and visualize the GitHub Flow example` — 201 checks.
+3. `docs: explain GitHub Flow assumptions and review paths` — full suite and demos.
+
+The existing schema, validator, HTML styling and default onboarding launcher remain
+unchanged. The example is a separate Java main class with an optional XML output
+path. It saves/reloads XML before generating the basic HTML from the saved file.

@@ -145,14 +145,14 @@ fields and types are rejected. See [FORMAT.md](FORMAT.md) for the exact contract
 questions. [onboarding.process.xml](examples/onboarding.process.xml) is a committed,
 deterministically generated fixture checked against the Java example.
 
-Verified on Java 21.0.9 with Maven 3.8.7: **166 checks**. The harness covers model
+Verified on Java 21.0.9 with Maven 3.8.7: **201 checks**. The harness covers model
 validation, immutable lists, diagnostic severity, all input types, supported node
 types, XML round trips, optional fields, Unicode/whitespace, unknown content,
 DOCTYPE/entity/network-reference rejection, file errors and the real no-argument
 launcher. It also verifies same-file protection and existing-output preservation
 when copying invalid input.
 
-Maven runs the harness under `process-model-checks`; look for `Passed 166 checks`.
+Maven runs the harness under `process-model-checks`; look for `Passed 201 checks`.
 Surefire reports zero JUnit tests because this is a separate plain Java harness.
 A failing check fails Maven before packaging/installing. `mvn -DskipTests package`
 skips this harness when explicitly requested.
@@ -197,3 +197,21 @@ markers, labels/defaults, cycles, disconnected nodes, escaping, source preservat
 output preservation and command behavior. Browser rendering verification was
 blocked by the preview tool's restriction on local file URLs; open the generated
 file in your browser to inspect it visually.
+
+
+## Second example: software change from proposal to merge
+
+[GitHub Flow walkthrough and assumptions](examples/GITHUB-FLOW.md) describes an
+adaptation of GitHub's documented branch/review workflow. It adds parallel checks
+and review, a combined readiness decision, revision cycles, and separate merge and
+closure endings. It also records responsibilities, data dependencies and unresolved
+repository policies. It performs no GitHub operations.
+
+```sh
+java -cp target/classes local.dev.mavenproject3processmodel.examples.GitHubFlowExample
+```
+
+This generates `target/github-flow.process.xml` and `target/github-flow.html`.
+NetBeans Run File on `GitHubFlowExample.java` does the same. Run Project still
+selects onboarding. The committed [XML](examples/github-flow.process.xml) and
+[basic HTML](examples/github-flow.html) are kept reproducible by the test harness.
