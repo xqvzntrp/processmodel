@@ -1,0 +1,875 @@
+<?xml version='1.0' encoding='utf-8'?>
+<processModel xmlns="urn:local.dev:processmodel:1" version="1">
+  <processes>
+    <processDefinition>
+      <processId>authorProcess</processId>
+      <name>Author a process XML model</name>
+      <description>A practical guide to creating a .process.xml file: define the business process, encode its records, validate the file and review its meaning. This model describes authoring; it does not execute validation or publish files. Review may result in acceptance, revision or a documented pause for unresolved information.</description>
+    </processDefinition>
+  </processes>
+  <elements>
+    <processElement>
+      <elementId>need</elementId>
+      <processId>authorProcess</processId>
+      <elementType>START_EVENT</elementType>
+      <name>New model needed</name>
+      <description>Someone needs to describe a process in the custom XML format.</description>
+    </processElement>
+    <processElement>
+      <elementId>define</elementId>
+      <processId>authorProcess</processId>
+      <elementType>SUB_PROCESS</elementType>
+      <name>Define the process</name>
+      <description>Produce a process specification with boundaries, activities, paths, scopes, roles, information and unresolved questions. On revision, revisit the affected decisions.</description>
+    </processElement>
+    <processElement>
+      <elementId>encode</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Write or generate the XML</name>
+      <description>Use an existing compatible .process.xml file as a structural reference. Create processModel with namespace urn:local.dev:processmodel:1 and version 1. Populate processes, elements, relationships, inputs, performers, assignments, dataItems, dataAssociations and openQuestions. Give records stable, unambiguous IDs and use them consistently in references. XML is case-sensitive: close and nest tags correctly, and encode an ampersand as &amp;amp;. Save UTF-8 text with a descriptive .process.xml filename. A script may generate these same records; embedded example XML in the HTML is not needed.</description>
+    </processElement>
+    <processElement>
+      <elementId>validateReview</elementId>
+      <processId>authorProcess</processId>
+      <elementType>SUB_PROCESS</elementType>
+      <name>Validate and review</name>
+      <description>Check technical structure, then examine diagrams and business meaning. Return exactly one review decision: accepted, revise or paused, with findings.</description>
+    </processElement>
+    <processElement>
+      <elementId>decision</elementId>
+      <processId>authorProcess</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Review decision</name>
+      <description>Follow the explicitly recorded review decision. Accepted requires passing technical checks and owner agreement on scope and behavior; unresolved blocking questions require revision or a pause.</description>
+    </processElement>
+    <processElement>
+      <elementId>revise</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Plan the revision</name>
+      <description>Use the findings to identify affected activities, paths, scopes or XML records. Return to Define the process, preserving unaffected work, then regenerate and revalidate the file.</description>
+    </processElement>
+    <processElement>
+      <elementId>save</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Save the accepted model</name>
+      <description>Save the reviewed .process.xml file alongside the viewer or in the agreed model directory. Record its purpose, owner and revision in the project history. Keep it separate from the HTML. Copy to another project only when that copy is authorized.</description>
+    </processElement>
+    <processElement>
+      <elementId>complete</elementId>
+      <processId>authorProcess</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Model ready to use</name>
+      <description>The accepted file is available to open in the viewer. Later process changes start another authoring revision.</description>
+    </processElement>
+    <processElement>
+      <elementId>pause</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record why authoring is paused</name>
+      <description>Record missing information, the person who can resolve it and the next action. Preserve the draft and findings as unfinished work; do not label the draft accepted.</description>
+    </processElement>
+    <processElement>
+      <elementId>paused</elementId>
+      <processId>authorProcess</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Draft preserved for later</name>
+      <description>This authoring attempt is paused. When the missing information arrives, begin another authoring attempt using the preserved draft.</description>
+    </processElement>
+    <processElement>
+      <elementId>defineStart</elementId>
+      <processId>authorProcess</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Definition work begins</name>
+      <description>Gather a process owner, relevant participants and any existing notes.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>boundaries</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Define purpose and boundaries</name>
+      <description>State why this process exists, what triggers it, its possible final outcomes and what is outside scope. Choose a clear process name and processId. A satisfactory result distinguishes a completed business outcome from merely finishing a task.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>mainFlow</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Describe the main flow</name>
+      <description>List the usual sequence from a START_EVENT to an END_EVENT. Name each USER_TASK or SERVICE_TASK with an action and explain its expected result. Treat a service task as work performed by a system; the viewer itself does not execute it.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>branches</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Add decisions, exceptions and loops</name>
+      <description>Use an EXCLUSIVE_GATEWAY when exactly one alternative should be selected; label outgoing flows and state mutually exclusive conditions. Include rejection, correction and retry paths that are in scope. If work genuinely runs concurrently, use PARALLEL_GATEWAY split and join points with matching intent. Conditions describe business rules; the viewer does not evaluate them.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>scopes</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Organize subprocesses</name>
+      <description>Group a coherent block of work into a SUB_PROCESS. Set each directly contained element parentSubprocessId to that subprocess elementId. Give the internal scope its own start and end events. Connect outer sequence flows to the subprocess element, and keep internal flows inside the scope. For deeper nesting, repeat this pattern.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>responsibility</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Assign roles and information</name>
+      <description>Define performers and link tasks through activityAssignment records. Define processDataItem records for meaningful documents or information; use activityDataAssociation INPUT and OUTPUT links to show consumption and production. Define processInput records for information supplied when the process starts. Data associations describe dependencies, not execution order.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>questions</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record unresolved questions</name>
+      <description>Attach processOpenQuestion records to the relevant elements. State each unknown rule as a concrete question, such as who approves a request above a threshold. Distinguish assumptions from confirmed facts. Do not silently invent business rules to complete the diagram.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>confirm</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Confirm the process specification</name>
+      <description>Walk the main, alternative and exception paths with the process owner. Check that roles, inputs and outputs match the actual or intended process. Record remaining questions so the later review can decide whether they block acceptance.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>defineEnd</elementId>
+      <processId>authorProcess</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Specification available</name>
+      <description>The process specification is ready to encode, including documented questions.</description>
+      <parentSubprocessId>define</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>checkStart</elementId>
+      <processId>authorProcess</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Draft XML available</name>
+      <description>Begin validation against the intended process specification.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>technical</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Validate XML and references</name>
+      <description>Parse the file as XML. Check the expected namespace, version, section names and supported elementType values against the project format. Check unique record IDs, required fields and all flow, parent, assignment and data references. A parent must be a SUB_PROCESS and ancestry must not cycle. Every sequence flow must stay within one scope. Each modeled scope needs a start and an end; every element should be reachable from a start and able to reach an end. Record failures. Parsing alone does not prove these checks pass.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>technicalDecision</elementId>
+      <processId>authorProcess</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Technical checks pass?</name>
+      <description>Choose pass only after completing the technical checks. Otherwise record failures and return a revision result.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>viewer</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Inspect diagrams in the viewer</name>
+      <description>Open the HTML viewer, choose Open XML file and select the draft. Inspect the main process and every subprocess. Confirm that opening each scope displays its corresponding diagram in the right sidebar. Follow incoming and outgoing flows, performer links and consumed/produced data. Compare displayed counts and labels with the XML.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>walkthrough</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Review business behavior</name>
+      <description>Walk each supported outcome with the process owner. Check gateway alternatives, revision loops, subprocess entry and return, task responsibility and data dependencies. Identify dead ends, ambiguous rules and unmodeled exceptions. Record accepted only if the file represents the agreed scope and no blocking findings remain; choose revise for actionable changes or paused for missing information that prevents completion.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>recordRevision</elementId>
+      <processId>authorProcess</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record validation failures</name>
+      <description>Capture failed checks with element IDs and the corrections needed. Set the review decision to revise; the draft has not passed technical validation.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>checkEnd</elementId>
+      <processId>authorProcess</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Review result available</name>
+      <description>Return the review decision and findings to the parent authoring process.</description>
+      <parentSubprocessId>validateReview</parentSubprocessId>
+    </processElement>
+  </elements>
+  <relationships>
+    <processRelationship>
+      <relationshipId>flow01</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>need</sourceElementId>
+      <targetElementId>define</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow02</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>define</sourceElementId>
+      <targetElementId>encode</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow03</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>encode</sourceElementId>
+      <targetElementId>validateReview</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow04</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>validateReview</sourceElementId>
+      <targetElementId>decision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow05</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>revise</sourceElementId>
+      <targetElementId>define</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow06</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>save</sourceElementId>
+      <targetElementId>complete</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow07</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>pause</sourceElementId>
+      <targetElementId>paused</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow08</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>checkStart</sourceElementId>
+      <targetElementId>technical</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow09</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>technical</sourceElementId>
+      <targetElementId>technicalDecision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow10</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>viewer</sourceElementId>
+      <targetElementId>walkthrough</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow11</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>walkthrough</sourceElementId>
+      <targetElementId>checkEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow12</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>recordRevision</sourceElementId>
+      <targetElementId>checkEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow13</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>defineStart</sourceElementId>
+      <targetElementId>boundaries</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow14</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>boundaries</sourceElementId>
+      <targetElementId>mainFlow</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow15</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>mainFlow</sourceElementId>
+      <targetElementId>branches</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow16</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>branches</sourceElementId>
+      <targetElementId>scopes</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow17</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>scopes</sourceElementId>
+      <targetElementId>responsibility</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow18</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>responsibility</sourceElementId>
+      <targetElementId>questions</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow19</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>questions</sourceElementId>
+      <targetElementId>confirm</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow20</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>confirm</sourceElementId>
+      <targetElementId>defineEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow21</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>save</targetElementId>
+      <name>Accepted</name>
+      <conditionExpression>reviewDecision == 'accepted'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow22</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>revise</targetElementId>
+      <name>Revise</name>
+      <conditionExpression>reviewDecision == 'revise'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow23</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>pause</targetElementId>
+      <name>Paused</name>
+      <conditionExpression>reviewDecision == 'paused'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow24</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>technicalDecision</sourceElementId>
+      <targetElementId>viewer</targetElementId>
+      <name>Pass</name>
+      <conditionExpression>technicalChecksPassed == true</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow25</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>technicalDecision</sourceElementId>
+      <targetElementId>recordRevision</targetElementId>
+      <name>Fail</name>
+      <conditionExpression>technicalChecksPassed == false</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+  </relationships>
+  <inputs>
+    <processInput>
+      <processId>authorProcess</processId>
+      <inputName>processPurpose</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>authorProcess</processId>
+      <inputName>sourceNotes</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>false</isRequired>
+    </processInput>
+    <processInput>
+      <processId>authorProcess</processId>
+      <inputName>existingDraft</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>false</isRequired>
+    </processInput>
+  </inputs>
+  <performers>
+    <performerDefinition>
+      <performerId>author</performerId>
+      <name>Process author</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Defines and encodes the model and performs technical checks.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>owner</performerId>
+      <name>Process owner</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Confirms business meaning, scope and acceptance. This role may be filled by the same person as the author in a small project.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>reviewer</performerId>
+      <name>Model reviewer</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Inspects diagrams and relationships independently where practical.</description>
+    </performerDefinition>
+  </performers>
+  <assignments>
+    <activityAssignment>
+      <elementId>define</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>encode</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>validateReview</elementId>
+      <performerId>reviewer</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>revise</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>save</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>pause</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>boundaries</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>mainFlow</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>branches</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>scopes</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>responsibility</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>questions</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>confirm</elementId>
+      <performerId>owner</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>technical</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>viewer</elementId>
+      <performerId>reviewer</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>walkthrough</elementId>
+      <performerId>owner</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>recordRevision</elementId>
+      <performerId>author</performerId>
+    </activityAssignment>
+  </assignments>
+  <dataItems>
+    <processDataItem>
+      <dataItemId>brief</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Process brief</name>
+      <description>Purpose, trigger, outcomes, scope and source notes.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>specification</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Process specification</name>
+      <description>Activities, gateways, flows, scopes, roles, information and documented assumptions.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>questionsData</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Unresolved questions</name>
+      <description>Known unknowns attached to relevant activities; review determines which block acceptance.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>draft</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Draft process XML</name>
+      <description>Current UTF-8 .process.xml file, not yet accepted.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>checks</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Technical check results</name>
+      <description>Specific checks performed, their pass/fail results and referenced record IDs.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>findings</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Review findings</name>
+      <description>Business and viewer observations, required revisions or reasons to pause.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>reviewResult</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Review decision</name>
+      <description>Exactly one of accepted, revise or paused, with supporting reasons.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>accepted</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Accepted process XML</name>
+      <description>Reviewed file saved in the agreed project location.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>pausedDraft</dataItemId>
+      <processId>authorProcess</processId>
+      <name>Paused authoring record</name>
+      <description>Unfinished draft, outstanding questions, owners and next actions.</description>
+    </processDataItem>
+  </dataItems>
+  <dataAssociations>
+    <activityDataAssociation>
+      <elementId>define</elementId>
+      <dataItemId>brief</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>define</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>define</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>boundaries</elementId>
+      <dataItemId>brief</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>boundaries</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>mainFlow</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>mainFlow</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>branches</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>branches</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>scopes</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>scopes</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>responsibility</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>responsibility</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>questions</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>questions</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>confirm</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>encode</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>encode</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>encode</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>checks</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>validateReview</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>technical</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>technical</elementId>
+      <dataItemId>checks</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>viewer</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>viewer</elementId>
+      <dataItemId>checks</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>viewer</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>specification</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>walkthrough</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordRevision</elementId>
+      <dataItemId>checks</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordRevision</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordRevision</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>brief</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>save</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>save</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>save</elementId>
+      <dataItemId>accepted</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>pause</elementId>
+      <dataItemId>draft</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>pause</elementId>
+      <dataItemId>questionsData</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>pause</elementId>
+      <dataItemId>findings</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>pause</elementId>
+      <dataItemId>reviewResult</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>pause</elementId>
+      <dataItemId>pausedDraft</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+  </dataAssociations>
+  <openQuestions>
+    <processOpenQuestion>
+      <questionId>acceptanceOwner</questionId>
+      <processId>authorProcess</processId>
+      <elementId>walkthrough</elementId>
+      <description>Who has authority to accept a model for this project?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>validationTool</questionId>
+      <processId>authorProcess</processId>
+      <elementId>technical</elementId>
+      <description>Which project validator or schema is authoritative, and which checks still require manual review?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>storageConvention</questionId>
+      <processId>authorProcess</processId>
+      <elementId>save</elementId>
+      <description>Where should accepted models live, and what naming and revision conventions should authors follow?</description>
+    </processOpenQuestion>
+  </openQuestions>
+</processModel>

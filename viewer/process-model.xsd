@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p="urn:local.dev:processmodel:1" targetNamespace="urn:local.dev:processmodel:1" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>Version 1 custom process model. Structure and reference checks complement ProcessModelValidator; graph semantics require separate validation.</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="Id">
+    <xs:restriction base="xs:ID">
+      <xs:pattern value="[A-Za-z_][A-Za-z0-9_.-]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Ref">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[A-Za-z_][A-Za-z0-9_.-]*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NonBlank">
+    <xs:restriction base="xs:token">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Boolean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="true" />
+      <xs:enumeration value="false" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ElementType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="START_EVENT" />
+      <xs:enumeration value="END_EVENT" />
+      <xs:enumeration value="TASK" />
+      <xs:enumeration value="USER_TASK" />
+      <xs:enumeration value="SERVICE_TASK" />
+      <xs:enumeration value="SUB_PROCESS" />
+      <xs:enumeration value="EXCLUSIVE_GATEWAY" />
+      <xs:enumeration value="PARALLEL_GATEWAY" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RelationshipType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SEQUENCE_FLOW" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PerformerType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="HUMAN_ROLE" />
+      <xs:enumeration value="SYSTEM" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="InputDataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STRING" />
+      <xs:enumeration value="NUMBER" />
+      <xs:enumeration value="BOOLEAN" />
+      <xs:enumeration value="DATE" />
+      <xs:enumeration value="TIMESTAMP" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataDirection">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INPUT" />
+      <xs:enumeration value="OUTPUT" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="processDefinitionType">
+    <xs:all>
+      <xs:element name="processId" type="p:Id" minOccurs="1" />
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="processElementType">
+    <xs:all>
+      <xs:element name="elementId" type="p:Id" minOccurs="1" />
+      <xs:element name="processId" type="p:Ref" minOccurs="1" />
+      <xs:element name="elementType" type="p:ElementType" minOccurs="1" />
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+      <xs:element name="parentSubprocessId" type="p:Ref" minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="processRelationshipType">
+    <xs:all>
+      <xs:element name="relationshipId" type="p:Id" minOccurs="1" />
+      <xs:element name="relationshipType" type="p:RelationshipType" minOccurs="1" />
+      <xs:element name="sourceElementId" type="p:Ref" minOccurs="1" />
+      <xs:element name="targetElementId" type="p:Ref" minOccurs="1" />
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="conditionExpression" type="xs:string" minOccurs="0" />
+      <xs:element name="isDefault" type="p:Boolean" minOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="processInputType">
+    <xs:all>
+      <xs:element name="processId" type="p:Ref" minOccurs="1" />
+      <xs:element name="inputName" type="p:NonBlank" minOccurs="1" />
+      <xs:element name="dataType" type="p:InputDataType" minOccurs="1" />
+      <xs:element name="isRequired" type="p:Boolean" minOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="performerDefinitionType">
+    <xs:all>
+      <xs:element name="performerId" type="p:Id" minOccurs="1" />
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="performerType" type="p:PerformerType" minOccurs="1" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="activityAssignmentType">
+    <xs:all>
+      <xs:element name="elementId" type="p:Ref" minOccurs="1" />
+      <xs:element name="performerId" type="p:Ref" minOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="processDataItemType">
+    <xs:all>
+      <xs:element name="dataItemId" type="p:Id" minOccurs="1" />
+      <xs:element name="processId" type="p:Ref" minOccurs="1" />
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="activityDataAssociationType">
+    <xs:all>
+      <xs:element name="elementId" type="p:Ref" minOccurs="1" />
+      <xs:element name="dataItemId" type="p:Ref" minOccurs="1" />
+      <xs:element name="direction" type="p:DataDirection" minOccurs="1" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="processOpenQuestionType">
+    <xs:all>
+      <xs:element name="questionId" type="p:Id" minOccurs="1" />
+      <xs:element name="processId" type="p:Ref" minOccurs="1" />
+      <xs:element name="elementId" type="p:Ref" minOccurs="0" />
+      <xs:element name="description" type="xs:string" minOccurs="0" />
+    </xs:all>
+  </xs:complexType>
+  <xs:element name="processModel">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="processes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processDefinition" type="p:processDefinitionType" minOccurs="1" maxOccurs="1" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="elements">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processElement" type="p:processElementType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="relationships">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processRelationship" type="p:processRelationshipType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="inputs">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processInput" type="p:processInputType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="performers">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="performerDefinition" type="p:performerDefinitionType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="assignments">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="activityAssignment" type="p:activityAssignmentType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="dataItems">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processDataItem" type="p:processDataItemType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="dataAssociations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="activityDataAssociation" type="p:activityDataAssociationType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="openQuestions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="processOpenQuestion" type="p:processOpenQuestionType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+      <xs:attribute name="version" type="xs:string" use="required" fixed="1" />
+    </xs:complexType>
+    <xs:key name="processIds">
+      <xs:selector xpath="p:processes/p:processDefinition" />
+      <xs:field xpath="p:processId" />
+    </xs:key>
+    <xs:key name="elementIds">
+      <xs:selector xpath="p:elements/p:processElement" />
+      <xs:field xpath="p:elementId" />
+    </xs:key>
+    <xs:key name="performerIds">
+      <xs:selector xpath="p:performers/p:performerDefinition" />
+      <xs:field xpath="p:performerId" />
+    </xs:key>
+    <xs:key name="dataIds">
+      <xs:selector xpath="p:dataItems/p:processDataItem" />
+      <xs:field xpath="p:dataItemId" />
+    </xs:key>
+    <xs:unique name="inputNames">
+      <xs:selector xpath="p:inputs/p:processInput" />
+      <xs:field xpath="p:processId" />
+      <xs:field xpath="p:inputName" />
+    </xs:unique>
+    <xs:unique name="assignmentPairs">
+      <xs:selector xpath="p:assignments/p:activityAssignment" />
+      <xs:field xpath="p:elementId" />
+      <xs:field xpath="p:performerId" />
+    </xs:unique>
+    <xs:unique name="associationTriples">
+      <xs:selector xpath="p:dataAssociations/p:activityDataAssociation" />
+      <xs:field xpath="p:elementId" />
+      <xs:field xpath="p:dataItemId" />
+      <xs:field xpath="p:direction" />
+    </xs:unique>
+    <xs:keyref name="processOwners" refer="p:processIds">
+      <xs:selector xpath="p:elements/p:processElement | p:inputs/p:processInput | p:dataItems/p:processDataItem | p:openQuestions/p:processOpenQuestion" />
+      <xs:field xpath="p:processId" />
+    </xs:keyref>
+    <xs:keyref name="flowSources" refer="p:elementIds">
+      <xs:selector xpath="p:relationships/p:processRelationship" />
+      <xs:field xpath="p:sourceElementId" />
+    </xs:keyref>
+    <xs:keyref name="flowTargets" refer="p:elementIds">
+      <xs:selector xpath="p:relationships/p:processRelationship" />
+      <xs:field xpath="p:targetElementId" />
+    </xs:keyref>
+    <xs:keyref name="parents" refer="p:elementIds">
+      <xs:selector xpath="p:elements/p:processElement" />
+      <xs:field xpath="p:parentSubprocessId" />
+    </xs:keyref>
+    <xs:keyref name="assignedElements" refer="p:elementIds">
+      <xs:selector xpath="p:assignments/p:activityAssignment" />
+      <xs:field xpath="p:elementId" />
+    </xs:keyref>
+    <xs:keyref name="associatedElements" refer="p:elementIds">
+      <xs:selector xpath="p:dataAssociations/p:activityDataAssociation" />
+      <xs:field xpath="p:elementId" />
+    </xs:keyref>
+    <xs:keyref name="questionElements" refer="p:elementIds">
+      <xs:selector xpath="p:openQuestions/p:processOpenQuestion" />
+      <xs:field xpath="p:elementId" />
+    </xs:keyref>
+    <xs:keyref name="assignedPerformers" refer="p:performerIds">
+      <xs:selector xpath="p:assignments/p:activityAssignment" />
+      <xs:field xpath="p:performerId" />
+    </xs:keyref>
+    <xs:keyref name="associatedData" refer="p:dataIds">
+      <xs:selector xpath="p:dataAssociations/p:activityDataAssociation" />
+      <xs:field xpath="p:dataItemId" />
+    </xs:keyref>
+  </xs:element>
+</xs:schema>

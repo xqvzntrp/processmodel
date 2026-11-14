@@ -1,0 +1,1013 @@
+<?xml version='1.0' encoding='utf-8'?>
+<processModel xmlns="urn:local.dev:processmodel:1" version="1">
+  <processes>
+    <processDefinition>
+      <processId>purchaseApproval</processId>
+      <name>Purchase request through payment</name>
+      <description>Illustrative purchase approval process: manager review, budget and ordering, then receipt and invoice checks before payment. Models one order, one complete delivery and one invoice. Partial deliveries, cancellation after ordering, returns and payment failures are outside this example; local approval rules remain open questions. This is a descriptive model, not an executable purchasing system.</description>
+    </processDefinition>
+  </processes>
+  <elements>
+    <processElement>
+      <elementId>need</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Purchase needed</name>
+      <description>An employee identifies a business need.</description>
+    </processElement>
+    <processElement>
+      <elementId>submit</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Submit purchase request</name>
+      <description>Describe the need, specification, estimated cost and cost center.</description>
+    </processElement>
+    <processElement>
+      <elementId>review</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Review purchase request</name>
+      <description>Record exactly one decision: approve, request changes or reject. Reassess revised requests.</description>
+    </processElement>
+    <processElement>
+      <elementId>decision</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Manager decision</name>
+      <description>Select the recorded manager decision.</description>
+    </processElement>
+    <processElement>
+      <elementId>revise</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Revise request</name>
+      <description>Address review comments and resubmit the updated request.</description>
+    </processElement>
+    <processElement>
+      <elementId>arrange</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>SUB_PROCESS</elementType>
+      <name>Arrange purchase</name>
+      <description>Check budget and place an approved order. Return an ordering result: placed or not placed.</description>
+    </processElement>
+    <processElement>
+      <elementId>orderDecision</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Order placed?</name>
+      <description>Continue only if an order was placed; otherwise close with the recorded budget reason.</description>
+    </processElement>
+    <processElement>
+      <elementId>receivePay</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>SUB_PROCESS</elementType>
+      <name>Receive and pay</name>
+      <description>Confirm complete delivery, resolve invoice differences and record authorized payment.</description>
+    </processElement>
+    <processElement>
+      <elementId>close</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Close completed request</name>
+      <description>Confirm delivery and payment records are linked to the request.</description>
+    </processElement>
+    <processElement>
+      <elementId>complete</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Purchase completed</name>
+      <description>The purchase has been received, payment recorded and request closed.</description>
+    </processElement>
+    <processElement>
+      <elementId>notifyRejected</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Notify employee of closure</name>
+      <description>Record and communicate manager rejection or unavailable budget. No order has been placed on either closure path.</description>
+    </processElement>
+    <processElement>
+      <elementId>rejected</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Request closed without purchase</name>
+      <description>The request is closed with the reason recorded.</description>
+    </processElement>
+    <processElement>
+      <elementId>orderStart</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Approved request received</name>
+      <description>Begin arranging the approved purchase.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>checkBudget</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Check available budget</name>
+      <description>Record whether sufficient budget is available for the approved request.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>budgetDecision</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Budget available?</name>
+      <description>Select the recorded budget outcome.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>placeOrder</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Place purchase order</name>
+      <description>Select the supplier, issue the order and record an ordering result of placed. This example assumes the supplier accepts the order.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>recordNoOrder</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record unavailable budget</name>
+      <description>Record an ordering result of not placed and the budget reason.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>orderEnd</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Ordering result available</name>
+      <description>Return the ordering result and purchase order, if one was placed.</description>
+      <parentSubprocessId>arrange</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>receiptStart</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>START_EVENT</elementType>
+      <name>Order ready for receipt</name>
+      <description>Begin fulfillment and settlement for the placed order.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>receiveGoods</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Inspect delivery</name>
+      <description>Record delivered items, quantities and condition.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>deliveryDecision</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Delivery acceptable?</name>
+      <description>Confirm that the complete delivery meets the order.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>resolveDelivery</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Resolve delivery issue</name>
+      <description>Arrange replacement or correction with the supplier, then inspect the corrected delivery. This example assumes eventual resolution.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>recordReceipt</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record accepted receipt</name>
+      <description>Record acceptance of the complete delivery.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>matchInvoice</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Match invoice to order and receipt</name>
+      <description>Obtain the invoice and compare supplier, quantities and amounts with the order and accepted receipt.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>invoiceDecision</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>EXCLUSIVE_GATEWAY</elementType>
+      <name>Invoice matches?</name>
+      <description>Select the recorded invoice match outcome.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>resolveInvoice</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Resolve invoice discrepancy</name>
+      <description>Obtain a corrected invoice or resolve the discrepancy, then repeat matching.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>authorizePayment</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Authorize payment</name>
+      <description>Record authorization after invoice matching, using the organization approval policy.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>recordPayment</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>USER_TASK</elementType>
+      <name>Record supplier payment</name>
+      <description>Record the payment reference after payment through the organization payment system. Payment execution and failures are outside this model.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+    <processElement>
+      <elementId>receiptEnd</elementId>
+      <processId>purchaseApproval</processId>
+      <elementType>END_EVENT</elementType>
+      <name>Receipt and payment complete</name>
+      <description>Return accepted receipt, matched invoice, authorization and payment record.</description>
+      <parentSubprocessId>receivePay</parentSubprocessId>
+    </processElement>
+  </elements>
+  <relationships>
+    <processRelationship>
+      <relationshipId>flow01</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>need</sourceElementId>
+      <targetElementId>submit</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow02</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>submit</sourceElementId>
+      <targetElementId>review</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow03</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>review</sourceElementId>
+      <targetElementId>decision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow04</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>revise</sourceElementId>
+      <targetElementId>review</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow05</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>arrange</sourceElementId>
+      <targetElementId>orderDecision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow06</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>receivePay</sourceElementId>
+      <targetElementId>close</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow07</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>close</sourceElementId>
+      <targetElementId>complete</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow08</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>notifyRejected</sourceElementId>
+      <targetElementId>rejected</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow09</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>orderStart</sourceElementId>
+      <targetElementId>checkBudget</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow10</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>checkBudget</sourceElementId>
+      <targetElementId>budgetDecision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow11</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>placeOrder</sourceElementId>
+      <targetElementId>orderEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow12</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>recordNoOrder</sourceElementId>
+      <targetElementId>orderEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow13</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>receiptStart</sourceElementId>
+      <targetElementId>receiveGoods</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow14</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>receiveGoods</sourceElementId>
+      <targetElementId>deliveryDecision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow15</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>resolveDelivery</sourceElementId>
+      <targetElementId>receiveGoods</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow16</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>recordReceipt</sourceElementId>
+      <targetElementId>matchInvoice</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow17</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>matchInvoice</sourceElementId>
+      <targetElementId>invoiceDecision</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow18</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>resolveInvoice</sourceElementId>
+      <targetElementId>matchInvoice</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow19</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>authorizePayment</sourceElementId>
+      <targetElementId>recordPayment</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow20</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>recordPayment</sourceElementId>
+      <targetElementId>receiptEnd</targetElementId>
+      <name />
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow21</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>arrange</targetElementId>
+      <name>Approved</name>
+      <conditionExpression>managerDecision == 'approved'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow22</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>revise</targetElementId>
+      <name>Changes requested</name>
+      <conditionExpression>managerDecision == 'revise'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow23</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>decision</sourceElementId>
+      <targetElementId>notifyRejected</targetElementId>
+      <name>Rejected</name>
+      <conditionExpression>managerDecision == 'rejected'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow24</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>orderDecision</sourceElementId>
+      <targetElementId>receivePay</targetElementId>
+      <name>Order placed</name>
+      <conditionExpression>orderingResult == 'placed'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow25</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>orderDecision</sourceElementId>
+      <targetElementId>notifyRejected</targetElementId>
+      <name>No budget</name>
+      <conditionExpression>orderingResult == 'notPlaced'</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow26</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>budgetDecision</sourceElementId>
+      <targetElementId>placeOrder</targetElementId>
+      <name>Available</name>
+      <conditionExpression>budgetAvailable == true</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow27</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>budgetDecision</sourceElementId>
+      <targetElementId>recordNoOrder</targetElementId>
+      <name>Unavailable</name>
+      <conditionExpression>budgetAvailable == false</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow28</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>deliveryDecision</sourceElementId>
+      <targetElementId>recordReceipt</targetElementId>
+      <name>Accepted</name>
+      <conditionExpression>deliveryAccepted == true</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow29</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>deliveryDecision</sourceElementId>
+      <targetElementId>resolveDelivery</targetElementId>
+      <name>Correction needed</name>
+      <conditionExpression>deliveryAccepted == false</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow30</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>invoiceDecision</sourceElementId>
+      <targetElementId>authorizePayment</targetElementId>
+      <name>Matched</name>
+      <conditionExpression>invoiceMatched == true</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+    <processRelationship>
+      <relationshipId>flow31</relationshipId>
+      <relationshipType>SEQUENCE_FLOW</relationshipType>
+      <sourceElementId>invoiceDecision</sourceElementId>
+      <targetElementId>resolveInvoice</targetElementId>
+      <name>Discrepancy</name>
+      <conditionExpression>invoiceMatched == false</conditionExpression>
+      <isDefault>false</isDefault>
+    </processRelationship>
+  </relationships>
+  <inputs>
+    <processInput>
+      <processId>purchaseApproval</processId>
+      <inputName>requesterName</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>purchaseApproval</processId>
+      <inputName>businessNeed</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>purchaseApproval</processId>
+      <inputName>costCenter</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>purchaseApproval</processId>
+      <inputName>estimatedCost</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+    <processInput>
+      <processId>purchaseApproval</processId>
+      <inputName>currency</inputName>
+      <dataType>STRING</dataType>
+      <isRequired>true</isRequired>
+    </processInput>
+  </inputs>
+  <performers>
+    <performerDefinition>
+      <performerId>employee</performerId>
+      <name>Employee</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Requests the purchase and inspects received goods.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>manager</performerId>
+      <name>Manager</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Reviews requests and authorizes matched payments according to local policy.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>purchasing</performerId>
+      <name>Purchasing</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Places orders, coordinates supplier corrections and closes requests.</description>
+    </performerDefinition>
+    <performerDefinition>
+      <performerId>finance</performerId>
+      <name>Finance</name>
+      <performerType>HUMAN_ROLE</performerType>
+      <description>Checks budget, matches invoices and records payment.</description>
+    </performerDefinition>
+  </performers>
+  <assignments>
+    <activityAssignment>
+      <elementId>submit</elementId>
+      <performerId>employee</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>review</elementId>
+      <performerId>manager</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>revise</elementId>
+      <performerId>employee</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>arrange</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>receivePay</elementId>
+      <performerId>finance</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>close</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>notifyRejected</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>checkBudget</elementId>
+      <performerId>finance</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>placeOrder</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>recordNoOrder</elementId>
+      <performerId>finance</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>receiveGoods</elementId>
+      <performerId>employee</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>resolveDelivery</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>recordReceipt</elementId>
+      <performerId>employee</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>matchInvoice</elementId>
+      <performerId>finance</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>resolveInvoice</elementId>
+      <performerId>purchasing</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>authorizePayment</elementId>
+      <performerId>manager</performerId>
+    </activityAssignment>
+    <activityAssignment>
+      <elementId>recordPayment</elementId>
+      <performerId>finance</performerId>
+    </activityAssignment>
+  </assignments>
+  <dataItems>
+    <processDataItem>
+      <dataItemId>request</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Purchase request</name>
+      <description>Specification, business reason, estimate, currency and cost center.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>approval</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Manager review</name>
+      <description>Decision and comments for the current version of the request.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>budget</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Budget assessment</name>
+      <description>Available or unavailable budget and the reason.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>order</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Purchase order</name>
+      <description>Supplier, agreed items, quantities, price and delivery terms.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>ordering</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Ordering result</name>
+      <description>Placed or not placed; includes reason when no order is placed.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>inspection</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Delivery inspection</name>
+      <description>Observed quantities, condition and acceptance decision.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>receipt</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Accepted receipt</name>
+      <description>Confirmation that the full delivery was accepted.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>invoice</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Supplier invoice</name>
+      <description>Current invoice and any corrections obtained from the supplier.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>match</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Invoice match result</name>
+      <description>Whether the invoice matches the order and accepted receipt.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>authorization</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Payment authorization</name>
+      <description>Recorded approval for payment of the matched invoice.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>payment</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Payment record</name>
+      <description>Reference and amount of the recorded supplier payment.</description>
+    </processDataItem>
+    <processDataItem>
+      <dataItemId>closure</dataItemId>
+      <processId>purchaseApproval</processId>
+      <name>Request closure</name>
+      <description>Completed or closed without purchase, with supporting reason.</description>
+    </processDataItem>
+  </dataItems>
+  <dataAssociations>
+    <activityDataAssociation>
+      <elementId>submit</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>review</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>revise</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>arrange</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>arrange</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>arrange</elementId>
+      <dataItemId>budget</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>arrange</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>arrange</elementId>
+      <dataItemId>ordering</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>checkBudget</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>checkBudget</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>checkBudget</elementId>
+      <dataItemId>budget</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>placeOrder</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>placeOrder</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>placeOrder</elementId>
+      <dataItemId>budget</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>placeOrder</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>placeOrder</elementId>
+      <dataItemId>ordering</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordNoOrder</elementId>
+      <dataItemId>budget</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordNoOrder</elementId>
+      <dataItemId>ordering</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>receipt</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>match</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>authorization</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receivePay</elementId>
+      <dataItemId>payment</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receiveGoods</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>receiveGoods</elementId>
+      <dataItemId>inspection</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveDelivery</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveDelivery</elementId>
+      <dataItemId>inspection</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveDelivery</elementId>
+      <dataItemId>inspection</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordReceipt</elementId>
+      <dataItemId>inspection</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordReceipt</elementId>
+      <dataItemId>receipt</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>matchInvoice</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>matchInvoice</elementId>
+      <dataItemId>receipt</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>matchInvoice</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>matchInvoice</elementId>
+      <dataItemId>match</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveInvoice</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveInvoice</elementId>
+      <dataItemId>match</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveInvoice</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveInvoice</elementId>
+      <dataItemId>receipt</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>resolveInvoice</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>authorizePayment</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>authorizePayment</elementId>
+      <dataItemId>match</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>authorizePayment</elementId>
+      <dataItemId>authorization</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordPayment</elementId>
+      <dataItemId>invoice</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordPayment</elementId>
+      <dataItemId>authorization</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>recordPayment</elementId>
+      <dataItemId>payment</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>close</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>close</elementId>
+      <dataItemId>order</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>close</elementId>
+      <dataItemId>receipt</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>close</elementId>
+      <dataItemId>payment</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>close</elementId>
+      <dataItemId>closure</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>notifyRejected</elementId>
+      <dataItemId>request</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>notifyRejected</elementId>
+      <dataItemId>approval</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>notifyRejected</elementId>
+      <dataItemId>ordering</dataItemId>
+      <direction>INPUT</direction>
+    </activityDataAssociation>
+    <activityDataAssociation>
+      <elementId>notifyRejected</elementId>
+      <dataItemId>closure</dataItemId>
+      <direction>OUTPUT</direction>
+    </activityDataAssociation>
+  </dataAssociations>
+  <openQuestions>
+    <processOpenQuestion>
+      <questionId>approvalLimits</questionId>
+      <processId>purchaseApproval</processId>
+      <elementId>review</elementId>
+      <description>What approval limits and escalation rules apply to this organization?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>budgetTiming</questionId>
+      <processId>purchaseApproval</processId>
+      <elementId>checkBudget</elementId>
+      <description>Is budget reserved at approval, when ordering, or at another point?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>paymentAuthority</questionId>
+      <processId>purchaseApproval</processId>
+      <elementId>authorizePayment</elementId>
+      <description>Who may authorize payment, and must this person differ from the request approver?</description>
+    </processOpenQuestion>
+    <processOpenQuestion>
+      <questionId>exceptionPolicy</questionId>
+      <processId>purchaseApproval</processId>
+      <elementId>receivePay</elementId>
+      <description>How should partial deliveries, unresolved discrepancies, cancellations, returns and failed payments be modeled?</description>
+    </processOpenQuestion>
+  </openQuestions>
+</processModel>
