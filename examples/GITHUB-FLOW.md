@@ -7,7 +7,7 @@ workflow, not a copied BPMN file or an executable GitHub integration.
 
 Our example adds explicit coordination, data dependencies and policy questions.
 It is not a claim that every repository uses these rules. Running the example
-only saves local XML and basic HTML; it does not push, open/close PRs, merge,
+only saves local XML; it does not push, open/close PRs, merge,
 delete branches, run CI or change repository settings.
 
 ## Source and adaptation
@@ -92,11 +92,9 @@ mvn clean install
 java -cp target/classes local.dev.mavenproject3processmodel.examples.GitHubFlowExample
 ```
 
-This saves and reloads `target/github-flow.process.xml`, then parses that saved XML
-to generate `target/github-flow.html`. Open the HTML in a browser. It uses the same
-basic read-only diagram and tables as onboarding. The diagram needs internet access
-to load Mermaid; tables are embedded in the page. Browser rendering has not been
-visually verified by the agent because local-file previews are blocked.
+This saves and reloads `target/github-flow.process.xml`. Open
+`viewer/process_relational_viewer_v4_sidebar.html` in a browser, choose **Open XML file**,
+and select that XML. No HTML report is generated.
 
 A custom output location is optional (its parent directory must exist):
 
@@ -104,20 +102,18 @@ A custom output location is optional (its parent directory must exist):
 java -cp target/classes local.dev.mavenproject3processmodel.examples.GitHubFlowExample target/another-change.process.xml
 ```
 
-To view or validate the committed saved model without regenerating it from Java:
+To validate the committed model without regenerating it from Java:
 
 ```sh
 java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar validate examples/github-flow.process.xml
-java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar html examples/github-flow.process.xml target/github-flow.html
 ```
 
 In NetBeans, right-click `GitHubFlowExample.java` and choose **Run File**. **Run
 Project (F6)** retains onboarding as its default. No action mapping was changed.
 
-Committed files: [XML](github-flow.process.xml) and [basic HTML](github-flow.html).
-The regression suite checks both against the specification and saved-XML export.
-With the new example, the full suite passes **280 checks**.
-
+The committed [XML](github-flow.process.xml) is checked against the Java specification
+and serialization output by the regression suite. Open it directly in the standalone
+viewer to inspect it without running the example.
 
 A separate [nested adaptation](NESTED-SUBPROCESSES.md) groups validation and build
 verification into embedded subprocesses. This flat example remains unchanged.

@@ -66,7 +66,6 @@ The default run reports:
 
 ```text
 Saved and reloaded target/onboarding.process.xml
-Saved HTML target/onboarding.html
 Process: Employee onboarding
 Elements: 13; relationships: 15
 Inputs: 3; performers: 4; assignments: 7
@@ -81,15 +80,10 @@ example, changing a targetElementId to `absent` produces UNKNOWN_TARGET. The ori
 fixture is protected by a regression check against the Java model.
 
 
-## Basic HTML view
+## View the model
 
-After running the demo, open `target/onboarding.html` in your browser. It shows the
-control-flow diagram followed by plain tables of the model data and the two open
-questions. It is read-only. Internet access is needed for the Mermaid flowchart;
-the tables are embedded in the HTML.
-
-To visualize the committed XML without regenerating the Java example:
-
-```sh
-java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar html examples/onboarding.process.xml target/onboarding.html
-```
+Open `viewer/process_relational_viewer_v4_sidebar.html` from the project root in
+your browser, choose **Open XML file**, and select `target/onboarding.process.xml`
+or the committed `examples/onboarding.process.xml`. The viewer derives its pages
+and diagram from that file. Java produces no HTML companion. After editing XML,
+select the file again to refresh the view.

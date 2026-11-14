@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
 import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
-import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 import local.dev.mavenproject3processmodel.model.*;
 
 /**
@@ -24,16 +23,12 @@ public final class GitHubFlowExample {
         }
         try {
             Path output = Path.of(args.length == 0 ? "target/github-flow.process.xml" : args[0]);
-            Path html = ProcessModelHtml.companionPath(output);
-            ProcessModelHtml.requireDifferent(output, html);
             var codec = new ProcessModelXml();
             var model = model();
             codec.write(model, output);
             var saved = codec.read(output);
             if (!saved.equals(model)) throw new IllegalStateException("Saved GitHub Flow model differs");
-            new ProcessModelHtml().write(output, html);
             System.out.println("Saved and reloaded " + output);
-            System.out.println("Saved HTML " + html);
             System.out.println("Elements: " + saved.elements().size() + "; relationships: " + saved.relationships().size());
             var validation = new ProcessModelValidator().validate(saved);
             System.out.println("Structurally valid; warnings: " + validation.diagnostics().size());

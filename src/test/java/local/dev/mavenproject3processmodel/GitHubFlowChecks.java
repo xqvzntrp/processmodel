@@ -15,7 +15,6 @@ import local.dev.mavenproject3processmodel.examples.GitHubFlowExample;
 import local.dev.mavenproject3processmodel.model.*;
 import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
-import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 
 final class GitHubFlowChecks {
     private static int checks;
@@ -86,13 +85,6 @@ final class GitHubFlowChecks {
         Path example = Path.of("examples/github-flow.process.xml");
         check(codec.read(example).equals(model), "committed XML matches Java specification");
         check(Files.readString(example).equals(codec.toXml(model)), "committed XML is reproducible");
-        byte[] original = Files.readAllBytes(example);
-        var html = new ProcessModelHtml();
-        String page = html.export(example);
-        check(page.equals(Files.readString(Path.of("examples/github-flow.html"))), "committed HTML comes from saved XML");
-        check(Arrays.equals(original, Files.readAllBytes(example)), "visualization leaves source XML unchanged");
-        check(page.contains("n12 --&gt;|&quot;Updated commits&quot;| n6"), "diagram displays the review/check revision loop");
-        check(page.contains("qSoloReview") && page.contains("qRequiredChecks") && page.contains("qMergeRules") && page.contains("qClosedBranch"), "all policy questions visible");
         Path dir = Files.createTempDirectory("github-flow-example-");
         try {
             Files.createDirectory(dir.resolve("target"));
@@ -100,17 +92,13 @@ final class GitHubFlowChecks {
             check(generated.status() == 0 && generated.console().contains("Structurally valid; warnings: 4"), "no-argument example launcher works");
             Path xml = dir.resolve("target/github-flow.process.xml");
             check(codec.read(xml).equals(model), "launcher XML round trip");
-            check(Files.readString(dir.resolve("target/github-flow.html")).equals(html.export(xml)), "launcher generates matching basic HTML");
+            check(!Files.exists(dir.resolve("target/github-flow.html")), "launcher produces XML without HTML");
             check(!Files.exists(dir.resolve(".git")), "example creates no Git repository");
             Path custom = dir.resolve("custom é.process.xml");
             check(launch(dir, custom.toString()).status() == 0 && codec.read(custom).equals(model), "custom Unicode output path");
             check(launch(dir, "one", "two").status() == 2, "invalid argument count");
             check(launch(dir, "missing/out.process.xml").status() == 1, "file error exit status");
-            Path aliasXml = dir.resolve("alias.process.xml");
-            Files.writeString(aliasXml, "keep existing");
-            Files.createLink(dir.resolve("alias.html"), aliasXml);
-            check(launch(dir, aliasXml.toString()).status() == 1 && Files.readString(aliasXml).equals("keep existing"),
-                "XML/HTML alias rejected before either is overwritten");
+
         } finally {
             try (var paths = Files.walk(dir)) {
                 for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(path);

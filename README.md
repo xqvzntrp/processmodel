@@ -13,9 +13,10 @@ this initial foundation; the BPMN reader project remains separate and unchanged.
 
 Requires a Java 21 JDK and Maven. The compiler uses `--release 21`, `-Xlint:all` and
 `-Werror`. A pinned compiler plugin fixes the scaffold's Java 5 default failure.
-No application/test library dependencies, schemas or build.sh are required.
-The Java build runs without a browser. Viewing the generated HTML uses a browser;
-rendering its flowchart needs internet access to load Mermaid from a CDN.
+No application/test library dependencies or build.sh are required.
+The Java build and commands run without a browser and produce XML, not HTML.
+Open saved models in the standalone [viewer](viewer/process_relational_viewer_v4_sidebar.html).
+Its flowcharts use Mermaid from a CDN, with a simplified offline fallback.
 Maven plugins provide compilation, the plain Java test runner and JAR packaging.
 
 From this project directory:
@@ -23,7 +24,7 @@ From this project directory:
 ```sh
 mvn clean install
 
-# No arguments: save/reload the onboarding XML and generate basic read-only HTML.
+# No arguments: save/reload the onboarding XML and print a summary.
 java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar
 
 # Create the example at another output path.
@@ -31,9 +32,6 @@ java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar demo target/another.
 
 # Validate a saved model and print its summary and warnings.
 java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar validate examples/onboarding.process.xml
-
-# Export an existing saved XML file to basic read-only HTML.
-java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar html examples/onboarding.process.xml target/onboarding.html
 
 # Read a saved model, write a separate file, then reload it.
 java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar copy examples/onboarding.process.xml target/copied.process.xml
@@ -50,11 +48,11 @@ Open this directory in NetBeans and use **Run Project (F6)**. The checked-in
 `nbactions.xml` explicitly selects the application entry point. Run File on
 `Mavenproject3processmodel.java` also works without arguments. Both save
 `target/onboarding.process.xml`, reload it, verify the round trip, and print the
-reloaded model's summary and warnings. They also generate `target/onboarding.html`
-by parsing the saved XML. Open that file in your browser. Parent directories must already exist;
-compiling creates `target/`. These actions produce XML, basic HTML and console output.
+reloaded model's summary and warnings. Parent directories must already exist;
+compiling creates `target/`. Open the standalone viewer, choose **Open XML file**,
+and select `target/onboarding.process.xml`. These actions produce XML and console output.
 
-`validate` only reads its input. `copy` and `html` reject same-file paths, including symbolic
+`validate` only reads its input. `copy` rejects same-file paths, including symbolic
 and hard-link aliases. Successful writes overwrite the destination. Validation or
 parsing failure leaves existing output untouched; final writes are not atomic and
 an I/O failure can leave partial output. Status 0 means success, 1 means a model/file
@@ -152,14 +150,14 @@ fields and types are rejected. See [FORMAT.md](FORMAT.md) for the exact contract
 questions. [onboarding.process.xml](examples/onboarding.process.xml) is a committed,
 deterministically generated fixture checked against the Java example.
 
-Verified on Java 21.0.9 with Maven 3.8.7: **280 checks**. The harness covers model
+The suite passes **191 checks** after removing the Java HTML exporter and its tests. The harness covers model
 validation, immutable lists, diagnostic severity, all input types, supported node
 types, XML round trips, optional fields, Unicode/whitespace, unknown content,
 DOCTYPE/entity/network-reference rejection, file errors and the real no-argument
 launcher. It also verifies same-file protection and existing-output preservation
 when copying invalid input.
 
-Maven runs the harness under `process-model-checks`; look for `Passed 280 checks`.
+Maven runs the harness under `process-model-checks`; look for `Passed 191 checks`.
 Surefire reports zero JUnit tests because this is a separate plain Java harness.
 A failing check fails Maven before packaging/installing. `mvn -DskipTests package`
 skips this harness when explicitly requested.
@@ -167,47 +165,18 @@ skips this harness when explicitly requested.
 See [DESIGN.md](DESIGN.md) for the initial decisions and commit plan.
 
 
-## Basic read-only HTML
+## View saved process XML
 
-`ProcessModelHtml` reads the saved `.process.xml` through the secure parser. It
-produces a Mermaid flowchart for the main scope and one for each embedded
-subprocess, plus plain bordered tables for every model collection
-and validation warnings. No editing controls, navigation widgets or application
-framework are included. HTML export does not change the XML or execute conditions.
+Open [the standalone viewer](viewer/process_relational_viewer_v4_sidebar.html) in a browser,
+choose **Open XML file**, and select any `.process.xml` model. The right sidebar follows
+whichever main process or subprocess is open in the main area. Java does not generate
+HTML reports, and the former `html` command is no longer supported.
 
-Events use circles, tasks rectangles, gateways diamonds with X/+ markers, and
-subprocesses labeled subroutine boxes. Each subprocess's contents appear in a
-separate section with its parent context; no nested UI controls are added.
-User/service tasks are marked in their labels. Flow names and default-flow markers
-are displayed. Disconnected nodes and cycles are retained. Full condition text is
-shown in the relationships table; performers and data dependencies stay in tables
-rather than becoming control-flow arrows. The view is a simplified projection,
-not a BPMN diagram or execution format.
-
-The browser loads pinned Mermaid 12.3.0 from jsDelivr. Tables and warning text are
-static HTML and remain readable offline; the embedded Mermaid source remains
-visible when the library cannot load. No external Java dependencies were added.
-HTML text is escaped and diagram labels use Mermaid decimal entities. Only the
-fixed renderer script is executable; model text is not inserted into JavaScript.
-
-The default demo saves XML, then rereads it to generate a matching HTML companion:
-`onboarding.process.xml` → `onboarding.html`. Other `.xml` suffixes are also replaced
-with `.html`; other names get `.html` appended. The `copy` command remains an XML
-copy; use `html INPUT OUTPUT` to export any existing saved model.
-
-Export completes parsing, validation and text generation before opening the HTML
-output. It preserves existing HTML on invalid input and rejects same-file aliases.
-The demo checks XML/HTML aliases before writing XML. XML and HTML writes are not
-transactional; an I/O error may leave only XML or an older/partial HTML companion.
-Regenerate HTML after editing XML; an existing HTML file does not update itself.
-
-The HTML extension was delivered as three tested commits: exporter, demo/CLI
-integration, then documentation. The suite verifies all sections, shapes, task
-markers, labels/defaults, cycles, disconnected nodes, escaping, source preservation,
-output preservation and command behavior. Browser rendering verification was
-blocked by the preview tool's restriction on local file URLs; open the generated
-file in your browser to inspect it visually.
-
+You can author, schema-validate and view files without building the Java application.
+See [AUTHORING.md](viewer/AUTHORING.md) for a starter example, the format reference and
+schema-validation commands. The standalone XSD helper checks document structure and
+references; the Java application's `validate` command adds process-specific checks.
+The Java reader does not automatically run the XSD.
 
 ## Second example: software change from proposal to merge
 
@@ -221,10 +190,10 @@ repository policies. It performs no GitHub operations.
 java -cp target/classes local.dev.mavenproject3processmodel.examples.GitHubFlowExample
 ```
 
-This generates `target/github-flow.process.xml` and `target/github-flow.html`.
-NetBeans Run File on `GitHubFlowExample.java` does the same. Run Project still
-selects onboarding. The committed [XML](examples/github-flow.process.xml) and
-[basic HTML](examples/github-flow.html) are kept reproducible by the test harness.
+This generates `target/github-flow.process.xml`. Select that file in the standalone
+viewer. NetBeans Run File on `GitHubFlowExample.java` does the same. Run Project still
+selects onboarding. The committed [XML](examples/github-flow.process.xml) is kept
+reproducible by the test harness.
 
 
 ## Nested subprocess example
@@ -237,8 +206,7 @@ which contains compilation, conditional testing and check-result recording.
 java -cp target/classes local.dev.mavenproject3processmodel.examples.NestedChangeExample
 ```
 
-Open `target/nested-change.html` to see the three basic scope diagrams and full
-model tables. The saved source is `target/nested-change.process.xml`. NetBeans Run
-File on `NestedChangeExample.java` works without arguments. Run Project remains
-onboarding. The committed [XML](examples/nested-change.process.xml) and
-[HTML](examples/nested-change.html) are checked for reproducibility.
+Open `target/nested-change.process.xml` through **Open XML file** in the standalone
+viewer to explore the main process and both subprocesses. NetBeans Run File on
+`NestedChangeExample.java` works without arguments. Run Project remains onboarding.
+The committed [XML](examples/nested-change.process.xml) is checked for reproducibility.

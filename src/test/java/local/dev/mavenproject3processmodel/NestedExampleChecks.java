@@ -3,14 +3,12 @@ package local.dev.mavenproject3processmodel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import local.dev.mavenproject3processmodel.examples.NestedChangeExample;
 import local.dev.mavenproject3processmodel.model.*;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
 import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
-import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 
 final class NestedExampleChecks {
     private static int checks;
@@ -36,13 +34,6 @@ final class NestedExampleChecks {
         var codec = new ProcessModelXml();
         Path source = Path.of("examples/nested-change.process.xml");
         check(codec.read(source).equals(model) && codec.toXml(model).equals(Files.readString(source)), "nested example XML is reproducible");
-        byte[] before = Files.readAllBytes(source);
-        String html = new ProcessModelHtml().export(source);
-        check(html.equals(Files.readString(Path.of("examples/nested-change.html"))), "nested HTML fixture comes from saved XML");
-        check(html.split("<pre class=\\\"mermaid\\\">", -1).length == 4, "main, validation and build diagrams");
-        String main = html.substring(html.indexOf("<pre class=\"mermaid\">"), html.indexOf("</pre>"));
-        check(main.contains("Subprocess#58; Validate proposed change") && !main.contains("Compile changes"), "main diagram collapses the internal steps");
-        check(Arrays.equals(before, Files.readAllBytes(source)), "nested visualization preserves source XML");
         Path dir = Files.createTempDirectory("nested-example-");
         try {
             Files.createDirectory(dir.resolve("target"));
@@ -53,7 +44,7 @@ final class NestedExampleChecks {
             check(cli.waitFor() == 0 && console.contains("Structurally valid; warnings: 5"), "no-argument nested example launcher");
             Path saved = dir.resolve("target/nested-change.process.xml");
             check(codec.read(saved).equals(model), "launcher XML round trip");
-            check(Files.readString(dir.resolve("target/nested-change.html")).equals(new ProcessModelHtml().export(saved)), "launcher generates matching scoped HTML");
+            check(!Files.exists(dir.resolve("target/nested-change.html")), "nested launcher produces XML without HTML");
         } finally {
             try (var files = Files.walk(dir)) { for (Path path : files.sorted(Comparator.reverseOrder()).toList()) Files.delete(path); }
         }

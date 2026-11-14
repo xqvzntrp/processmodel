@@ -2,8 +2,8 @@
 
 The model now supports an embedded subprocess containing another embedded
 subprocess. The [nested-change XML](nested-change.process.xml) is derived from the
-[flat GitHub Flow example](GITHUB-FLOW.md). The [basic HTML](nested-change.html)
-shows three diagrams with the same plain tables and no editing controls.
+[flat GitHub Flow example](GITHUB-FLOW.md). Open the XML in the standalone viewer
+to browse the main process and its two subprocess diagrams.
 
 ```text
 Main software-change process
@@ -77,21 +77,19 @@ local runtime variables, parameter mappings, inherited assignments or automatic
 failure propagation. The compile/test report descriptions state how skipped tests
 are interpreted; the model does not store or enforce runtime values.
 
-## Persistence and HTML
+## Persistence and viewing
 
 No record or XML layout changed. SUB_PROCESS and parentSubprocessId already existed;
-the version-1 supported subset now accepts valid hierarchies. Flat XML/HTML fixtures
+the version-1 supported subset now accepts valid hierarchies. Existing flat XML fixtures
 remain identical. Older program revisions reject nested models.
 
 The saved XML still contains flat lists of records. Containment comes from IDs,
 not physically nested XML. The reader validates the complete hierarchy on load.
 
-HTML emits one diagram per scope, with a labeled subprocess box in the parent.
-Subprocess sections appear parent-first and display their ID and immediate parent.
-Each node and flow appears in exactly one scope diagram; the tables retain the
-complete model. Validation and scope ordering use iterative traversal rather than
-recursive Java calls. There is no one-level restriction; tests cover 256 levels of
-validation and 64 levels of XML/HTML round trips.
+The standalone viewer shows the diagram for the scope open in the main area.
+Parent diagrams contain subprocess nodes; opening a subprocess shows its direct
+children. Java validation uses iterative traversal with no one-level restriction;
+tests cover 256 levels of validation and 64 levels of XML round trips.
 
 ## Run it
 
@@ -102,24 +100,22 @@ mvn clean install
 java -cp target/classes local.dev.mavenproject3processmodel.examples.NestedChangeExample
 ```
 
-Open `target/nested-change.html` in a browser. Its source is
-`target/nested-change.process.xml`. A custom output path is optional, with an
+Open `viewer/process_relational_viewer_v4_sidebar.html` in a browser, choose
+**Open XML file**, and select `target/nested-change.process.xml`. A custom output path is optional, with an
 existing parent directory:
 
 ```sh
 java -cp target/classes local.dev.mavenproject3processmodel.examples.NestedChangeExample target/my-nested.process.xml
 ```
 
-To visualize the committed XML directly:
+To validate the committed XML directly (open it separately in the viewer):
 
 ```sh
 java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar validate examples/nested-change.process.xml
-java -jar target/mavenproject3processmodel-1.0-SNAPSHOT.jar html examples/nested-change.process.xml target/nested-change.html
 ```
 
 NetBeans Run File on `NestedChangeExample.java` generates the example. Run Project
 continues to use onboarding. No Git/GitHub operations are executed. This adds
 embedded scopes, not reusable called processes, BPMN export or an execution engine.
-The diagram needs internet access for Mermaid; the rest is static read-only HTML.
-Browser rendering has not been visually verified by the agent because file-URL
-previews are blocked. Full Maven suite: **280 checks passed**.
+The viewer loads Mermaid when online and provides a simplified offline fallback.
+Java produces no HTML reports. The XML-only Maven suite passes 191 checks.

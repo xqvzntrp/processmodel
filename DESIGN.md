@@ -80,68 +80,29 @@ The executable JAR has also been exercised. No source history was rewritten or
 pushed, and the separate BPMN reader project was not modified.
 
 
-## Basic read-only HTML continuation
+## XML output and standalone presentation
 
-A direct rich-XML visual projection is separate from future BPMN adaptation. The
-HTML exporter reads the saved project XML, then emits a Mermaid control-flow view
-and static tables for all nine collections and warnings. It adds no editor or
-execution behavior. Java remains dependency-free; the browser loads a pinned
-Mermaid renderer from a CDN. Export never writes the source XML.
+Java creates, validates, reads and writes `.process.xml` models. The default demo
+and both software-change examples save XML, reload it and report summaries and
+warnings. They do not generate HTML companions. The former Java HTML exporter,
+`html` command, generated HTML fixtures and export-specific tests have been removed.
 
-Planned continuation commits, each verified before committing:
+The independent viewer in `viewer/` owns presentation. It reads a manually selected
+XML file and derives relational pages and scope diagrams at runtime. Authors can
+use it and the standalone XSD helper without the Java library. The XSD checks
+structure and references; `ProcessModelValidator` adds process-specific rules.
+Neither proves execution correctness or replaces business review.
 
-1. `feat: export saved process models as basic read-only HTML` — 155 checks.
-2. `feat: generate basic HTML from the saved demo model` — 166 checks.
-3. `docs: explain basic read-only HTML export` — full suite and application run.
+## Embedded subprocesses
 
-The default NetBeans/JAR demo generates XML and HTML. An explicit `html INPUT OUTPUT`
-command renders saved models. Validation and XML copy retain their existing roles.
-The browser preview tool cannot open local file URLs, so rendering inspection is
-left to a normal browser; automated export and command checks pass.
+Containment is represented by `parentSubprocessId`, with the same rule at every
+depth. Metadata remains process-owned: performers, data items and inputs are not
+cloned per subprocess. Assignments and data dependencies may refer to a subprocess
+activity; children have their own explicit bindings. There is no runtime variable
+scope, parameter passing, call mechanism, interruption or completion engine.
 
-
-## GitHub Flow example continuation
-
-The second example is an adaptation of GitHub's documented GitHub Flow. Its
-parallel coordination, readiness assessment and no-merge closure branch are explicit
-local modeling decisions. The accompanying walkthrough distinguishes them from
-the source and documents the absence of commit-versioned data or approval freshness
-checks. No workflow is executed and no repository policy is asserted.
-
-Planned and tested commits:
-
-1. `feat: model a documented GitHub Flow adaptation` — 187 checks.
-2. `feat: save and visualize the GitHub Flow example` — 201 checks.
-3. `docs: explain GitHub Flow assumptions and review paths` — full suite and demos.
-
-The existing schema, validator, HTML styling and default onboarding launcher remain
-unchanged. The example is a separate Java main class with an optional XML output
-path. It saves/reloads XML before generating the basic HTML from the saved file.
-
-
-## Nested subprocess continuation
-
-The original first-version rejection of subprocesses is superseded by embedded
-scope support. The records and XML field layout are unchanged. Version 1 already
-represented SUB_PROCESS and parentSubprocessId; accepting them is an additive
-supported-subset extension, not a new serialization shape. Existing flat files
-retain identical XML and HTML output. Older application revisions reject nested
-models rather than silently flatten them.
-
-Containment validation and scope ordering are iterative, with no one-level limit.
-Metadata remains process-owned: performers, data items and inputs are not cloned
-per subprocess. Assignments/data dependencies can refer to a subprocess activity;
-children have their own explicit bindings. There is no runtime variable scope,
-parameter passing, call mechanism, interruption, token-flow or completion engine.
-
-Four commits, tested before committing:
-
-1. `feat: validate nested embedded subprocess scopes` — 229 checks.
-2. `feat: visualize nested subprocesses by scope` — 263 checks.
-3. `feat: add a nested software-validation example` — 280 checks.
-4. `docs: explain nested subprocess scopes and examples` — full suite and demos.
-
-Validation tests cover 256 nesting levels. XML/HTML tests cover 64 nested scopes,
-node/flow preservation, per-diagram endpoint declarations, cycle rejection, scope
-entry/exit rules and escaping. The worked example contains two embedded levels.
-Browser rendering remains unverified by the agent due to local-file preview policy.
+Containment validation is iterative. Tests cover 256 nesting levels for validation
+and 64 levels for XML round trips, along with hierarchy cycles, scope boundaries,
+event direction, saved-example reproducibility and launcher behavior. The worked
+nested example contains two embedded subprocess levels. The XML-only suite passes
+191 checks.

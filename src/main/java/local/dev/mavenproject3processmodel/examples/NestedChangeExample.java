@@ -8,7 +8,6 @@ import java.util.Set;
 import local.dev.mavenproject3processmodel.model.*;
 import local.dev.mavenproject3processmodel.persistence.ProcessModelXml;
 import local.dev.mavenproject3processmodel.validation.ProcessModelValidator;
-import local.dev.mavenproject3processmodel.visualization.ProcessModelHtml;
 
 /** Embedded validation contains an embedded build subprocess. No repository actions execute. */
 public final class NestedChangeExample {
@@ -73,16 +72,12 @@ public final class NestedChangeExample {
         if (args.length > 1) { System.err.println("Usage: NestedChangeExample [OUTPUT.process.xml]"); System.exit(2); return; }
         try {
             Path output = Path.of(args.length == 0 ? "target/nested-change.process.xml" : args[0]);
-            Path html = ProcessModelHtml.companionPath(output);
-            ProcessModelHtml.requireDifferent(output, html);
             var codec = new ProcessModelXml();
             var model = model();
             codec.write(model, output);
             var saved = codec.read(output);
             if (!saved.equals(model)) throw new IllegalStateException("Nested model round trip differs");
-            new ProcessModelHtml().write(output, html);
             System.out.println("Saved and reloaded " + output);
-            System.out.println("Saved HTML " + html);
             System.out.println("Elements: " + saved.elements().size() + "; relationships: " + saved.relationships().size());
             var validation = new ProcessModelValidator().validate(saved);
             System.out.println("Structurally valid; warnings: " + validation.diagnostics().size());
